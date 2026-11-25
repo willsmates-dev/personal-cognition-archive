@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Naval 的杠杆 · 认知操作台</title>
+  <style>
+    :root {
+      /* 纯白底 + Claude 科技长文克制风：仅保留单一陶红强调色 */
+      --bg-paper: #FFFFFF;
+      --bg-card: #FFFFFF;
+      --bg-sand: #F7F7F5;
+      --bg-table-head: #F2F1EE;
+      --border: #E5E5E2;
+      --border-strong: #CECDC7;
+
+      --ink-1: #141413;
+      --ink-2: #4A4843;
+      --ink-3: #78756E;
+
+      --accent: #B44E2D;
+      --accent-deep: #8B3A1E;
+      --accent-tint: #FBF4F0;
+      --accent-border: #E5B9A8;
+
+      --radius-lg: 12px;
+      --radius-md: 8px;
+      --radius-sm: 5px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      max-width: 100%;
+      overflow-x: clip;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-paper);
+      color: var(--ink-1);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.72;
+      max-width: 100%;
+      overflow-x: clip;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4, p, li, pre {
+      overflow-wrap: anywhere;
+    }
+
+    .top-rule {
+      height: 3px;
+      background: var(--accent-deep);
+    }
+
+    /* 吸顶操作台工具条 */
+    .workbench-bar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .workbench-inner {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 10px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bar-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px 12px;
+    }
+
+    search.filter-search {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1 1 260px;
+      min-width: 0;
+    }
+
+    .search-input-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 6px 30px 6px 10px;
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      color: var(--ink-1);
+      background: #FFFFFF;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(180, 78, 45, 0.14);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 6px;
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--ink-3);
+      font-size: 14px;
+      line-height: 1;
+      padding: 4px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .search-clear.is-visible {
+      display: inline-block;
+    }
+
+    .filter-count {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-3);
+      white-space: nowrap;
+    }
+
+    .mode-switch {
+      display: inline-flex;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: var(--bg-sand);
+      padding: 2px;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .mode-btn {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--ink-2);
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .mode-btn[aria-pressed="true"] {
+      background: #FFFFFF;
+      color: var(--accent-deep);
+      box-shadow: 0 1px 2px rgba(20, 20, 19, 0.08);
+    }
+
+    .anchor-nav {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .anchor-nav a {
+      text-decoration: none;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--ink-2);
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: var(--bg-sand);
+      border: 1px solid transparent;
+    }
+
+    .anchor-nav a:hover,
+    .anchor-nav a:focus-visible {
+      color: var(--accent-deep);
+      background: #FFFFFF;
+      border-color: var(--border-strong);
+      outline: none;
+    }
+
+    /* 单栏主容器 */
+    .container {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 18px 64px;
+    }
+
+    @media (max-width: 640px) {
+      .workbench-inner { padding: 8px 14px; }
+      .container { padding: 20px 14px 48px; }
+    }
+
+    main, section, article, .details-body, .graph-wrap {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    /* 克制的文字微标（替代多彩药丸） */
+    .role-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 0 6px;
+      border-radius: 4px;
+      line-height: 1.55;
+      vertical-align: baseline;
+      margin-right: 4px;
+      background: var(--bg-sand);
+      color: var(--ink-2);
+      border: 1px solid var(--border);
+    }
+
+    .role-tag.is-user {
+      background: var(--accent-tint);
+      color: var(--accent-deep);
+      border-color: var(--accent-border);
+    }
+
+    .role-tag.is-proposal {
+      background: var(--accent-tint);
+      color: var(--accent-deep);
+      border: 1px dashed var(--accent);
+    }
+
+    /* 页头 */
+    .article-header {
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--accent-deep);
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(1.5rem, 1.25rem + 1.3vw, 2.15rem);
+      line-height: 1.26;
+      letter-spacing: -0.015em;
+      color: var(--ink-1);
+    }
+
+    .meta-line {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 6px 14px;
+      font-size: 13px;
+      color: var(--ink-3);
+    }
+
+    .meta-links a {
+      color: var(--accent-deep);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent-border);
+    }
+
+    .meta-links a:hover {
+      border-bottom-color: var(--accent-deep);
+    }
+
+    /* 章节标题 */
+    .sec {
+      margin-top: 32px;
+      scroll-margin-top: 96px;
+    }
+
+    .sec-head {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .sec-num {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-deep);
+    }
+
+    .sec-head h2 {
+      margin: 0;
+      font-size: clamp(1.15rem, 1.05rem + 0.5vw, 1.35rem);
+      line-height: 1.35;
+      color: var(--ink-1);
+    }
+
+    .sec-sub {
+      margin: 0 0 14px;
+      font-size: 14px;
+      color: var(--ink-3);
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+    }
+
+    @media (max-width: 640px) {
+      .card { padding: 15px 14px; }
+    }
+
+    /* 开篇主旨引文 */
+    .lead-box {
+      border-left: 3px solid var(--accent-deep);
+      padding: 4px 0 4px 16px;
+      margin: 0 0 18px;
+    }
+
+    .lead-box p {
+      margin: 0;
+      font-size: 15.5px;
+      color: var(--ink-1);
+    }
+
+    .lead-box p + p {
+      margin-top: 8px;
+    }
+
+    /* 思考路径紧凑步进条 */
+    .trace-strip {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    @media (max-width: 740px) {
+      .trace-strip {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .trace-item {
+      background: var(--bg-paper);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .trace-item.is-stop {
+      border-style: dashed;
+      border-color: var(--accent);
+      background: var(--accent-tint);
+    }
+
+    .trace-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--ink-3);
+    }
+
+    .trace-q {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-1);
+      line-height: 1.45;
+    }
+
+    .trace-a {
+      font-size: 12.5px;
+      color: var(--ink-2);
+      line-height: 1.48;
+    }
+
+    .trace-jump {
+      margin-top: auto;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--accent-deep);
+      text-decoration: none;
+      align-self: flex-start;
+    }
+
+    .trace-jump:hover {
+      text-decoration: underline;
+    }
+
+    /* 思维导图 SVG */
+    .graph-wrap {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+    }
+
+    .tree-desktop {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .tree-mobile {
+      display: none;
+      width: 100%;
+      height: auto;
+    }
+
+    @media (max-width: 700px) {
+      .tree-desktop { display: none; }
+      .tree-mobile { display: block; }
+      .graph-wrap { padding: 8px; }
+    }
+
+    .tree-node {
+      cursor: pointer;
+    }
+
+    .tree-node rect {
+      transition: stroke 0.15s ease, fill 0.15s ease;
+    }
+
+    .tree-node:hover rect,
+    .tree-node:focus-visible rect {
+      stroke: var(--accent);
+      fill: var(--accent-tint);
+    }
+
+    .tree-node:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* 30 秒速讲卡 */
+    .pitch-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-left: 3.5px solid var(--accent-deep);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+    }
+
+    .pitch-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .pitch-head h3 {
+      margin: 0;
+      font-size: 16px;
+      color: var(--ink-1);
+    }
+
+    .btn-ghost {
+      appearance: none;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-paper);
+      color: var(--ink-1);
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 5px 11px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--accent);
+      color: var(--accent-deep);
+      background: var(--accent-tint);
+      outline: none;
+    }
+
+    .pitch-lead {
+      font-size: 15.5px;
+      font-weight: 600;
+      color: var(--ink-1);
+      margin: 0 0 10px;
+    }
+
+    .pitch-list {
+      margin: 0 0 10px;
+      padding-left: 18px;
+      font-size: 14.5px;
+      color: var(--ink-2);
+    }
+
+    .pitch-list li + li {
+      margin-top: 5px;
+    }
+
+    .pitch-example {
+      background: var(--bg-sand);
+      border-radius: var(--radius-md);
+      padding: 9px 12px;
+      font-size: 14px;
+      color: var(--ink-1);
+    }
+
+    .copy-feedback {
+      font-size: 12.5px;
+      color: var(--accent-deep);
+      margin-left: 8px;
+    }
+
+    /* 判断列表与就地展开抽屉 */
+    .judgment-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .j-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      scroll-margin-top: 96px;
+    }
+
+    .j-card[hidden] {
+      display: none;
+    }
+
+    .j-card.is-flash {
+      animation: cardFlash 1.5s ease;
+    }
+
+    @keyframes cardFlash {
+      0% { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(180, 78, 45, 0.22); }
+      100% { border-color: var(--border); box-shadow: none; }
+    }
+
+    .j-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 6px 12px;
+      margin-bottom: 8px;
+    }
+
+    .j-title-group {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .j-id {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      flex-shrink: 0;
+    }
+
+    .j-top h3 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.38;
+      color: var(--ink-1);
+    }
+
+    .j-cites {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--ink-3);
+    }
+
+    .j-conclusion {
+      border-left: 2.5px solid var(--accent);
+      padding: 3px 0 3px 12px;
+      margin: 6px 0 12px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink-1);
+    }
+
+    /* 内嵌两个操作抽屉：展开论证 / 就地对照原文与对话 */
+    .drawer-pair {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    details.inline-drawer {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg-paper);
+      overflow: hidden;
+    }
+
+    details.inline-drawer > summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--ink-2);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    details.inline-drawer > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.inline-drawer > summary::before {
+      content: "";
+      inline-size: 0.9em;
+      block-size: 0.9em;
+      flex-shrink: 0;
+      background-color: var(--accent-deep);
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='black'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E") no-repeat center / contain;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='black'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E") no-repeat center / contain;
+      rotate: -90deg;
+    }
+
+    details.inline-drawer[open] > summary {
+      color: var(--accent-deep);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-sand);
+    }
+
+    details.inline-drawer[open] > summary::before {
+      rotate: 0deg;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      details.inline-drawer > summary::before,
+      .raw-accordion summary::before {
+        transition: rotate 0.18s ease;
+      }
+      details.inline-drawer::details-content,
+      .raw-accordion details::details-content {
+        interpolate-size: allow-keywords;
+        overflow: clip;
+        contain: layout;
+        transition: block-size 0.24s ease-in-out, content-visibility 0.24s ease-in-out allow-discrete;
+      }
+      details.inline-drawer:not([open])::details-content,
+      .raw-accordion details:not([open])::details-content {
+        block-size: 0;
+      }
+    }
+
+    .drawer-content {
+      padding: 12px 14px;
+      background: #FFFFFF;
+      font-size: 14.5px;
+      color: var(--ink-1);
+    }
+
+    .drawer-content h4 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-3);
+      letter-spacing: 0.03em;
+    }
+
+    .drawer-content p {
+      margin: 0 0 10px;
+    }
+
+    .drawer-content ul {
+      margin: 0 0 10px;
+      padding-left: 18px;
+    }
+
+    .drawer-content li + li {
+      margin-top: 5px;
+    }
+
+    .boundary-note {
+      background: var(--bg-sand);
+      border-left: 2.5px solid var(--border-strong);
+      padding: 8px 12px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    /* 就地原文对照内部结构 */
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 680px) {
+      .evidence-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .ev-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      background: var(--bg-paper);
+      font-size: 13.5px;
+      min-width: 0;
+    }
+
+    .ev-box pre {
+      margin: 6px 0 0;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      color: var(--ink-2);
+    }
+
+    .ev-thumb-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 4px 8px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: #FFFFFF;
+      color: var(--ink-1);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .ev-thumb-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent-deep);
+    }
+
+    .ev-thumb-btn img {
+      width: 28px;
+      height: 32px;
+      object-fit: cover;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+    }
+
+    .empty-search {
+      display: none;
+      padding: 20px;
+      text-align: center;
+      color: var(--ink-3);
+      background: #FFFFFF;
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius-lg);
+      font-size: 14px;
+    }
+
+    /* 专题补充表格 */
+    .table-scroll {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-top: 14px;
+    }
+
+    table.ed-table {
+      width: 100%;
+      min-width: 640px;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      line-height: 1.55;
+      background: #FFFFFF;
+    }
+
+    .ed-table th {
+      background: var(--bg-table-head);
+      color: var(--ink-1);
+      font-weight: 700;
+      text-align: left;
+      padding: 9px 11px;
+      border-bottom: 1px solid var(--border-strong);
+      white-space: nowrap;
+    }
+
+    .ed-table td {
+      padding: 9px 11px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--ink-2);
+    }
+
+    .ed-table td:first-child {
+      font-weight: 700;
+      color: var(--accent-deep);
+    }
+
+    .ed-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* 续聊与待决策 */
+    .resume-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .resume-card p {
+      margin: 0;
+      font-size: 14.5px;
+    }
+
+    .resume-card ul, .resume-card ol {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 14.5px;
+    }
+
+    .resume-card li + li {
+      margin-top: 5px;
+    }
+
+    .proposal-callout {
+      background: var(--accent-tint);
+      border: 1.2px dashed var(--accent);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+    }
+
+    .proposal-callout h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      color: var(--accent-deep);
+    }
+
+    /* 底部完整原材料库 */
+    .raw-accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .raw-accordion details {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .raw-accordion summary {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 10px;
+      padding: 13px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink-1);
+      cursor: pointer;
+      user-select: none;
+      background: var(--bg-paper);
+    }
+
+    .raw-accordion details[open] > summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .raw-accordion summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .raw-accordion summary::before {
+      content: "";
+      inline-size: 0.95em;
+      block-size: 0.95em;
+      flex-shrink: 0;
+      background-color: var(--accent-deep);
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='black'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E") no-repeat center / contain;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='black'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E") no-repeat center / contain;
+      rotate: -90deg;
+    }
+
+    .raw-accordion details[open] > summary::before {
+      rotate: 0deg;
+    }
+
+    .summary-meta {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--ink-3);
+    }
+
+    .details-body {
+      padding: 16px;
+    }
+
+    .source-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 720px) {
+      .source-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .source-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      background: var(--bg-paper);
+      min-width: 0;
+    }
+
+    .source-box h3 {
+      margin: 0 0 8px;
+      font-size: 14.5px;
+    }
+
+    .img-zoom-btn {
+      display: block;
+      width: 100%;
+      padding: 0;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: #FFFFFF;
+      cursor: zoom-in;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .img-zoom-btn img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1280 / 1463;
+    }
+
+    .transcript-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.58;
+      color: var(--ink-2);
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+      margin: 0;
+    }
+
+    .chat-round {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+      background: var(--bg-paper);
+    }
+
+    .chat-round > summary {
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .round-body {
+      padding: 12px;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .turn {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      background: var(--bg-paper);
+    }
+
+    .turn.is-user {
+      border-left: 3px solid var(--accent);
+      background: #FFFFFF;
+    }
+
+    .turn-head {
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--ink-2);
+    }
+
+    .turn pre {
+      margin: 0;
+      font-family: var(--font-sans);
+      font-size: 13.8px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      color: var(--ink-1);
+    }
+
+    /* 原图放大灯箱 */
+    dialog.lightbox {
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 0;
+      max-width: min(94vw, 840px);
+      max-height: 92dvh;
+      background: #FFFFFF;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+    }
+
+    dialog.lightbox::backdrop {
+      background: rgba(20, 20, 19, 0.62);
+    }
+
+    .lightbox-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-sand);
+    }
+
+    .lightbox-body {
+      padding: 12px;
+      overflow: auto;
+      max-height: calc(92dvh - 52px);
+    }
+
+    .lightbox-body img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .page-footer {
+      margin-top: 38px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 6px 14px;
+      font-size: 12.5px;
+      color: var(--ink-3);
+    }
+
+    .page-footer a {
+      color: var(--accent-deep);
+    }
+  </style>
+</head>
+<body>
+  <div class="top-rule" aria-hidden="true"></div>
+
+  <!-- 吸顶单栏操作台条 -->
+  <div class="workbench-bar">
+    <div class="workbench-inner">
+      <div class="bar-row">
+        <search class="filter-search" aria-label="检索观点与原文">
+          <div class="search-input-wrap">
+            <input type="search" id="wb-search" class="search-input" placeholder="搜观点、关键词或原话（如：无需许可、包子铺、10条）" aria-label="关键词过滤">
+            <button type="button" id="wb-search-clear" class="search-clear" aria-label="清空搜索">✕</button>
+          </div>
+          <span class="filter-count" id="wb-filter-count">5 / 5 条</span>
+        </search>
+
+        <div class="mode-switch" role="group" aria-label="阅读模式切换">
+          <button type="button" class="mode-btn" id="mode-brief" aria-pressed="true">速览模式</button>
+          <button type="button" class="mode-btn" id="mode-full" aria-pressed="false">精读全展</button>
+        </div>
+      </div>
+
+      <nav class="anchor-nav" aria-label="快速索引">
+        <a href="#overview">主旨轨迹</a>
+        <a href="#mindmap">思维导图</a>
+        <a href="#pitch">30秒速讲</a>
+        <a href="#judgments">核心判断 J01–J05</a>
+        <a href="#resume">续聊待定</a>
+        <a href="#raw-archive">原文库</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="container">
+    <header class="article-header">
+      <div class="eyebrow">个人认知沉淀 · NAVAL RAVIKANT</div>
+      <h1>Naval 的杠杆：从概念澄清到自媒体起步</h1>
+      <div class="meta-line">
+        <span>来源：Naval Ravikant on how to build leverage（英文笔记第 1–2 页）+ 5 轮完整对话</span>
+        <span class="meta-links">
+          底稿 <a href="./index.md">index.md</a> · 回顾版 <a href="./Naval的杠杆·认知精华.pdf">认知精华.pdf</a> · 原文版：<a href="./Naval的杠杆·纯英文原文.pdf">纯英文</a> / <a href="./Naval的杠杆·纯中文原文.pdf">纯中文</a> / <a href="./Naval的杠杆·中英原文.pdf">中英对照</a>
+        </span>
+      </div>
+    </header>
+
+    <main>
+      <!-- 1. 开篇区：主旨与思考路径 -->
+      <section id="overview" class="sec" aria-labelledby="overview-h">
+        <div class="sec-head">
+          <span class="sec-num">01</span>
+          <h2 id="overview-h">我想弄懂的问题与追问路径</h2>
+        </div>
+
+        <div class="lead-box">
+          <p><span class="role-tag is-user">我</span> <strong>起点问题：</strong>这两页英文笔记到底在讲金融炒股还是人生道理？「无需许可的杠杆」和「三种杠杆魔法组合」具体指什么？如果我想做自媒体，该如何从零开始？（C01–C05）</p>
+          <p><span class="role-tag">作者</span> <span class="role-tag">AI</span> <strong>核心理解：</strong>想摆脱纯卖时间的线性收入，就要在主动承担责任、磨出判断力和不可替代的专长知识的前提下，尽早装上「无需许可、边际复制成本为零」的新型杠杆（代码或媒体）；对零基础个人而言，直接用自媒体把本来就在折腾的事公开记录下来，就是门槛最低的起步方式。</p>
+        </div>
+
+        <div class="trace-strip" aria-label="五轮思考路径">
+          <div class="trace-item">
+            <div class="trace-top"><span>STEP 01</span><span>C01</span></div>
+            <div class="trace-q">附上两页笔记原图，求整体解读。</div>
+            <div class="trace-a">AI 搭出「三大基石 + 杠杆分类 + 担责判断」骨架。</div>
+            <a class="trace-jump" href="#j04" data-jump-card="j04">看 J04 →</a>
+          </div>
+          <div class="trace-item">
+            <div class="trace-top"><span>STEP 02</span><span>C02</span></div>
+            <div class="trace-q">没玩过股票，这讲人生还是金融？</div>
+            <div class="trace-a">确认不是借钱炒股，用物理撬棍和奶茶店类比澄清。</div>
+            <a class="trace-jump" href="#j01" data-jump-card="j01">看 J01 →</a>
+          </div>
+          <div class="trace-item">
+            <div class="trace-top"><span>STEP 03</span><span>C03</span></div>
+            <div class="trace-q">从头到尾举例子讲透并做总结。</div>
+            <div class="trace-a">补全培训证书 vs 审美直觉、自行车 vs 巨轮对照。</div>
+            <a class="trace-jump" href="#j04" data-jump-card="j04">看 J04 →</a>
+          </div>
+          <div class="trace-item">
+            <div class="trace-top"><span>STEP 04</span><span>C04</span></div>
+            <div class="trace-q">听成「无息许可」；不懂为何要三叠。</div>
+            <div class="trace-a">纠偏为「无需许可」，用包子铺/软件和15人公司讲透。</div>
+            <a class="trace-jump" href="#j02" data-jump-card="j02">看 J02/J03 →</a>
+          </div>
+          <div class="trace-item is-stop">
+            <div class="trace-top"><span>STEP 05 · 停点</span><span>C05</span></div>
+            <div class="trace-q">选定自媒体：如何开始与有何建议？</div>
+            <div class="trace-a">建议把折腾的事当副产品；提案「先发满 10 条」待定。</div>
+            <a class="trace-jump" href="#j05" data-jump-card="j05">看 J05 →</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. 思维导图区 -->
+      <section id="mindmap" class="sec" aria-labelledby="mindmap-h">
+        <div class="sec-head">
+          <span class="sec-num">02</span>
+          <h2 id="mindmap-h">思维导图：整套逻辑的树状脉络</h2>
+        </div>
+        <p class="sec-sub">从中心命题分出三条主干，点击任意分支节点可直接定位并展开对应判断卡。</p>
+
+        <div class="graph-wrap">
+          <!-- 桌面横向树状思维导图 -->
+          <svg class="tree-desktop" viewBox="0 0 820 426" role="img" aria-label="Naval 杠杆树状思维导图（桌面视图）">
+            <!-- 树状分支曲线 -->
+            <g fill="none" stroke="#C8C1B4" stroke-width="1.6">
+              <!-- Root -> 3 branches -->
+              <path d="M 154 213 C 194 213, 194 74, 232 74" stroke="#B44E2D" stroke-width="1.8" />
+              <path d="M 154 213 C 194 213, 194 213, 232 213" stroke="#B44E2D" stroke-width="1.8" />
+              <path d="M 154 213 C 194 213, 194 352, 232 352" stroke="#B44E2D" stroke-width="1.8" />
+
+              <!-- Branch 1 -> leaves -->
+              <path d="M 412 74 C 448 74, 448 40, 484 40" />
+              <path d="M 412 74 C 448 74, 448 106, 484 106" />
+
+              <!-- Branch 2 -> leaves -->
+              <path d="M 412 213 C 448 213, 448 176, 484 176" />
+              <path d="M 412 213 C 448 213, 448 242, 484 242" />
+
+              <!-- Branch 3 -> leaves -->
+              <path d="M 412 352 C 448 352, 448 318, 484 318" />
+              <path d="M 412 352 C 448 352, 448 384, 484 384" stroke="#B44E2D" stroke-dasharray="4 3" />
+            </g>
+
+            <!-- 中心母题 -->
+            <g class="tree-node" data-jump-card="j01" tabindex="0" role="link" aria-label="中心命题：如何摆脱纯卖时间，跳转到 J01">
+              <rect x="14" y="175" width="140" height="76" rx="8" fill="#FBF4F0" stroke="#8B3A1E" stroke-width="1.8" />
+              <text x="84" y="203" text-anchor="middle" font-size="13.5" font-weight="700" fill="#141413">如何摆脱纯卖时间</text>
+              <text x="84" y="224" text-anchor="middle" font-size="11.5" fill="#8B3A1E">规模化放大个人努力</text>
+              <text x="84" y="241" text-anchor="middle" font-size="11" fill="#78756E">J01 · 非借钱炒股</text>
+            </g>
+
+            <!-- 一级分支 1 -->
+            <g class="tree-node" data-jump-card="j02" tabindex="0" role="link" aria-label="分支1：个人为何能直接干，跳转到 J02">
+              <rect x="232" y="46" width="180" height="56" rx="7" fill="#F3F1EC" stroke="#CEC8BC" stroke-width="1.4" />
+              <text x="246" y="70" font-size="13" font-weight="700" fill="#141413">1. 个人为何能直接干</text>
+              <text x="246" y="89" font-size="11.5" fill="#4A4843">不求人批准 · 自带护城河</text>
+            </g>
+
+            <!-- 一级分支 2 -->
+            <g class="tree-node" data-jump-card="j03" tabindex="0" role="link" aria-label="分支2：一次努力如何放大，跳转到 J03">
+              <rect x="232" y="185" width="180" height="56" rx="7" fill="#F3F1EC" stroke="#CEC8BC" stroke-width="1.4" />
+              <text x="246" y="209" font-size="13" font-weight="700" fill="#141413">2. 一次努力如何放大</text>
+              <text x="246" y="228" font-size="11.5" fill="#4A4843">零边际复制 + 三杠杆叠加</text>
+            </g>
+
+            <!-- 一级分支 3 -->
+            <g class="tree-node" data-jump-card="j05" tabindex="0" role="link" aria-label="分支3：零起点怎么迈第一步，跳转到 J05">
+              <rect x="232" y="324" width="180" height="56" rx="7" fill="#F3F1EC" stroke="#CEC8BC" stroke-width="1.4" />
+              <text x="246" y="348" font-size="13" font-weight="700" fill="#141413">3. 零起点怎么迈第一步</text>
+              <text x="246" y="367" font-size="11.5" fill="#4A4843">公开担责 · 落到自媒体起步</text>
+            </g>
+
+            <!-- 二级叶节点 -->
+            <g class="tree-node" data-jump-card="j02" tabindex="0" role="link" aria-label="J02 无需许可杠杆">
+              <rect x="484" y="14" width="320" height="52" rx="6" fill="#FFFFFF" stroke="#E4E0D8" stroke-width="1.3" />
+              <text x="498" y="36" font-size="13" font-weight="700" fill="#141413">J02 · 无需许可杠杆（代码与媒体）</text>
+              <text x="498" y="54" font-size="11.5" fill="#4A4843">无需老板/投资人点头，今天就能开工</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j04" tabindex="0" role="link" aria-label="J04 专长知识与判断力">
+              <rect x="484" y="80" width="320" height="52" rx="6" fill="#FFFFFF" stroke="#E4E0D8" stroke-width="1.3" />
+              <text x="498" y="102" font-size="13" font-weight="700" fill="#141413">J04 · 不可培训的专长与判断力</text>
+              <text x="498" y="120" font-size="11.5" fill="#4A4843">顺着好奇心长出；高杠杆后慢下来把舵</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j02" tabindex="0" role="link" aria-label="J02 边际复制成本为零">
+              <rect x="484" y="150" width="320" height="52" rx="6" fill="#FFFFFF" stroke="#E4E0D8" stroke-width="1.3" />
+              <text x="498" y="172" font-size="13" font-weight="700" fill="#141413">J02 · 边际复制成本趋近于零</text>
+              <text x="498" y="190" font-size="11.5" fill="#4A4843">写/拍一次，服务 100 万人不再多花成本</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j03" tabindex="0" role="link" aria-label="J03 三种杠杆魔法组合">
+              <rect x="484" y="216" width="320" height="52" rx="6" fill="#FFFFFF" stroke="#E4E0D8" stroke-width="1.3" />
+              <text x="498" y="238" font-size="13" font-weight="700" fill="#141413">J03 · 团队爆发的「魔法组合」</text>
+              <text x="498" y="256" font-size="11.5" fill="#4A4843">极少精英人力 + 资本营销 + 代码媒体</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j05" tabindex="0" role="link" aria-label="J05 主动担责磨判断力">
+              <rect x="484" y="292" width="320" height="52" rx="6" fill="#FFFFFF" stroke="#E4E0D8" stroke-width="1.3" />
+              <text x="498" y="314" font-size="13" font-weight="700" fill="#141413">J05 · 先担责，把折腾的事公开发出来</text>
+              <text x="498" y="332" font-size="11.5" fill="#4A4843">同行者踩坑笔记 + 低阅读量当免费学费</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="resume" tabindex="0" role="link" aria-label="待决策提案：先发满 10 条">
+              <rect x="484" y="358" width="320" height="52" rx="6" fill="#FBF4F0" stroke="#B44E2D" stroke-width="1.4" stroke-dasharray="5 3" />
+              <text x="498" y="380" font-size="13" font-weight="700" fill="#8B3A1E">待决策 · 给自己定「先发满 10 条」</text>
+              <text x="498" y="398" font-size="11.5" fill="#4A4843">每周 1–2 条跑通闭环，尚待拍板是否执行</text>
+            </g>
+          </svg>
+
+          <!-- 手机竖屏清晰缩进树状思维导图 -->
+          <svg class="tree-mobile" viewBox="0 0 340 578" role="img" aria-label="Naval 杠杆树状思维导图（手机视图）">
+            <!-- 纵干线 -->
+            <line x1="22" y1="68" x2="22" y2="528" stroke="#CEC8BC" stroke-width="1.8" />
+            <!-- 分支横线 -->
+            <line x1="22" y1="112" x2="38" y2="112" stroke="#B44E2D" stroke-width="1.8" />
+            <line x1="22" y1="268" x2="38" y2="268" stroke="#B44E2D" stroke-width="1.8" />
+            <line x1="22" y1="424" x2="38" y2="424" stroke="#B44E2D" stroke-width="1.8" />
+
+            <!-- 二级缩进枝 -->
+            <line x1="54" y1="138" x2="54" y2="228" stroke="#E4E0D8" stroke-width="1.6" />
+            <line x1="54" y1="168" x2="68" y2="168" stroke="#E4E0D8" stroke-width="1.6" />
+            <line x1="54" y1="224" x2="68" y2="224" stroke="#E4E0D8" stroke-width="1.6" />
+
+            <line x1="54" y1="294" x2="54" y2="384" stroke="#E4E0D8" stroke-width="1.6" />
+            <line x1="54" y1="324" x2="68" y2="324" stroke="#E4E0D8" stroke-width="1.6" />
+            <line x1="54" y1="380" x2="68" y2="380" stroke="#E4E0D8" stroke-width="1.6" />
+
+            <line x1="54" y1="450" x2="54" y2="540" stroke="#E4E0D8" stroke-width="1.6" />
+            <line x1="54" y1="480" x2="68" y2="480" stroke="#E4E0D8" stroke-width="1.6" />
+            <line x1="54" y1="536" x2="68" y2="536" stroke="#B44E2D" stroke-width="1.6" stroke-dasharray="3 2" />
+
+            <!-- 中心母题 -->
+            <g class="tree-node" data-jump-card="j01" tabindex="0" role="link">
+              <rect x="10" y="10" width="320" height="58" rx="8" fill="#FBF4F0" stroke="#8B3A1E" stroke-width="1.6" />
+              <text x="24" y="34" font-size="14" font-weight="700" fill="#141413">如何摆脱纯卖时间（J01 · 非炒股）</text>
+              <text x="24" y="54" font-size="12.5" fill="#8B3A1E">通过杠杆把单次努力成倍放大</text>
+            </g>
+
+            <!-- 分支 1 -->
+            <g class="tree-node" data-jump-card="j02" tabindex="0" role="link">
+              <rect x="38" y="86" width="292" height="48" rx="6" fill="#F3F1EC" stroke="#CEC8BC" stroke-width="1.2" />
+              <text x="50" y="108" font-size="13.5" font-weight="700" fill="#141413">1. 个人为何能直接干</text>
+              <text x="50" y="125" font-size="12" fill="#4A4843">不求人批准 + 不可替代的专长</text>
+            </g>
+            <g class="tree-node" data-jump-card="j02" tabindex="0" role="link">
+              <rect x="68" y="144" width="262" height="46" rx="6" fill="#FFFFFF" stroke="#E4E0D8" />
+              <text x="80" y="164" font-size="13" font-weight="700" fill="#141413">J02 · 无需许可杠杆</text>
+              <text x="80" y="181" font-size="12" fill="#4A4843">写代码 / 做自媒体直接开干</text>
+            </g>
+            <g class="tree-node" data-jump-card="j04" tabindex="0" role="link">
+              <rect x="68" y="198" width="262" height="46" rx="6" fill="#FFFFFF" stroke="#E4E0D8" />
+              <text x="80" y="218" font-size="13" font-weight="700" fill="#141413">J04 · 专长知识与判断力</text>
+              <text x="80" y="235" font-size="12" fill="#4A4843">顺着好奇心；高杠杆后慢下来</text>
+            </g>
+
+            <!-- 分支 2 -->
+            <g class="tree-node" data-jump-card="j03" tabindex="0" role="link">
+              <rect x="38" y="252" width="292" height="42" rx="6" fill="#F3F1EC" stroke="#CEC8BC" stroke-width="1.2" />
+              <text x="50" y="278" font-size="13.5" font-weight="700" fill="#141413">2. 一次努力如何放大与组合</text>
+            </g>
+            <g class="tree-node" data-jump-card="j02" tabindex="0" role="link">
+              <rect x="68" y="302" width="262" height="46" rx="6" fill="#FFFFFF" stroke="#E4E0D8" />
+              <text x="80" y="322" font-size="13" font-weight="700" fill="#141413">J02 · 边际复制成本为零</text>
+              <text x="80" y="339" font-size="12" fill="#4A4843">服务 1 人与 100 万人成本近零</text>
+            </g>
+            <g class="tree-node" data-jump-card="j03" tabindex="0" role="link">
+              <rect x="68" y="356" width="262" height="46" rx="6" fill="#FFFFFF" stroke="#E4E0D8" />
+              <text x="80" y="376" font-size="13" font-weight="700" fill="#141413">J03 · 三杠杆魔法组合</text>
+              <text x="80" y="393" font-size="12" fill="#4A4843">精干人力 + 资本 + 代码媒体</text>
+            </g>
+
+            <!-- 分支 3 -->
+            <g class="tree-node" data-jump-card="j05" tabindex="0" role="link">
+              <rect x="38" y="410" width="292" height="42" rx="6" fill="#F3F1EC" stroke="#CEC8BC" stroke-width="1.2" />
+              <text x="50" y="436" font-size="13.5" font-weight="700" fill="#141413">3. 零起点怎么迈第一步</text>
+            </g>
+            <g class="tree-node" data-jump-card="j05" tabindex="0" role="link">
+              <rect x="68" y="460" width="262" height="46" rx="6" fill="#FFFFFF" stroke="#E4E0D8" />
+              <text x="80" y="480" font-size="13" font-weight="700" fill="#141413">J05 · 担责 + 自媒体起步</text>
+              <text x="80" y="497" font-size="12" fill="#4A4843">把在折腾的事写成踩坑记录</text>
+            </g>
+            <g class="tree-node" data-jump-card="resume" tabindex="0" role="link">
+              <rect x="68" y="514" width="262" height="50" rx="6" fill="#FBF4F0" stroke="#B44E2D" stroke-dasharray="4 3" />
+              <text x="80" y="535" font-size="13" font-weight="700" fill="#8B3A1E">待决策 · 先发满 10 条</text>
+              <text x="80" y="553" font-size="12" fill="#4A4843">周更 1–2 条跑通闭环</text>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <!-- 3. 快速讲出观点（30 秒复述卡） -->
+      <section id="pitch" class="sec" aria-labelledby="pitch-h">
+        <div class="sec-head">
+          <span class="sec-num">03</span>
+          <h2 id="pitch-h">快速讲出观点：30 秒口述版本</h2>
+        </div>
+
+        <article class="pitch-card">
+          <div class="pitch-head">
+            <h3>跟别人聊起这组笔记时，直接照这三段讲：</h3>
+            <div>
+              <button type="button" class="btn-ghost" id="copy-pitch-btn">复制 30 秒口述稿</button>
+              <span class="copy-feedback" id="pitch-status" role="status" aria-live="polite"></span>
+            </div>
+          </div>
+
+          <p class="pitch-lead">
+            1 句话点题：Naval 讲的杠杆不是借钱炒股，而是普通人不用求人批准、靠代码或内容把一次努力放大千万倍的“睡后放大器”。
+          </p>
+          <ol class="pitch-list">
+            <li><strong>凭什么钱流向你？</strong>靠培训班教不会的「专长知识」——顺着真实好奇心长出来，别人卷考证很快就会被替代。</li>
+            <li><strong>怎么把努力放大？</strong>普通人优先抓「无需许可 + 边际复制成本为零」的代码和自媒体；等小团队成型后，再叠加极少顶尖人才和资本去规模爆发。</li>
+            <li><strong>没资源第一步干嘛？</strong>先公开承担责任、拿作品直面真实反馈来熬判断力；做自媒体就是把本来在折腾的事顺手记录下来，先发满 10 条跑通闭环。</li>
+          </ol>
+          <div class="pitch-example">
+            <strong>最顺手的例子：</strong>开包子铺每多卖 1 个包子都得重揉一份面；写个小软件或拍条减脂餐视频，不管来 1 个人还是 100 万人看，你都不用多炒一盘菜——这就是零边际复制成本的威力。
+          </div>
+        </article>
+      </section>
+
+      <!-- 4. 核心判断操作列表 -->
+      <section id="judgments" class="sec" aria-labelledby="judgments-h">
+        <div class="sec-head">
+          <span class="sec-num">04</span>
+          <h2 id="judgments-h">核心判断索引：先扫结论，按需就地展开论证与原文</h2>
+        </div>
+        <p class="sec-sub">默认展示每条判断的一句话结论；点开下方抽屉即可看透论证或就地对照英文原文与原轮对话。</p>
+
+        <div class="empty-search" id="empty-search">没有匹配该关键词的判断，试试搜“杠杆”、“包子铺”、“判断力”或清空搜索框。</div>
+
+        <div class="judgment-stack" id="judgment-stack">
+          <!-- J01 -->
+          <article id="j01" class="j-card" data-keywords="J01 杠杆 金融 炒股 撬棍 打零工 摇奶茶 无息 放大器">
+            <div class="j-top">
+              <div class="j-title-group">
+                <span class="j-id">J01</span>
+                <h3>这里的「杠杆」是工作成果的放大器，而不是借钱炒股的金融杠杆</h3>
+              </div>
+              <span class="j-cites">S01 · C02 · C04</span>
+            </div>
+            <div class="j-conclusion">
+              <span class="role-tag">AI</span> Naval 笔记里的「杠杆」讲的是把单次个人努力成倍放大的工具与机制，属于个人成长与创造价值的方法，和股票市场借钱放大本金的金融杠杆不是一回事。
+            </div>
+
+            <div class="drawer-pair">
+              <details class="inline-drawer arg-drawer">
+                <summary>展开论证：为什么成立 · 边界或反例 · 关键例子</summary>
+                <div class="drawer-content">
+                  <h4>为什么成立</h4>
+                  <ul>
+                    <li><span class="role-tag">作者</span> 讨论的命题是「如何规模化获得报酬（Get paid at scale）」，列举的工具是劳动力、资本、代码与媒体。</li>
+                    <li><span class="role-tag">AI</span> 纯卖时间（打零工）受限于每天 24 小时上限；这里借用物理撬棍「四两拨千斤」的原理打破时间与产出的 1:1 绑定，不涉及借钱爆仓倒欠的风险。第 4 轮误听成「无息许可」也是金融联想的残留。</li>
+                  </ul>
+                  <div class="boundary-note">
+                    <strong>边界或反例：</strong><span class="role-tag">AI</span> 虽不需要懂炒股，但「资本杠杆」确实涉及募资；现实中若借债创业或加金融杠杆炒股，仍要面对本金亏损与债务违约风险，不能拿人生杠杆替高负债背书。
+                  </div>
+                  <h4>关键例子（假设对比场景）</h4>
+                  <p><span class="role-tag">AI</span> 按小时打零工是无杠杆生活，多赚一倍只能多熬一倍夜；摇奶茶自己一天最多 50 杯，雇 10 人一起摇（人力）或录条高赞教程让几万人看（媒体），都是在相同时间里成倍放大产出。</p>
+                </div>
+              </details>
+
+              <details class="inline-drawer src-drawer">
+                <summary>就地对照原文与对话（S01 · C02）</summary>
+                <div class="drawer-content">
+                  <div class="evidence-grid">
+                    <div class="ev-box">
+                      <strong><span class="role-tag">作者</span> S01 · Get paid at scale</strong>
+                      <pre>• If you want to make money you have to get paid at scale.
+• And why you, that's accountability, at scale, that's leverage, and just you getting paid as opposed to somebody else getting paid, that's specific knowledge.</pre>
+                      <button type="button" class="ev-thumb-btn" data-zoom-src="./raw/source_01.jpg" data-zoom-title="S01 · 英文笔记第 1 页">
+                        <img src="./raw/source_01.jpg" alt="S01 缩略图" width="1280" height="1463" loading="eager">
+                        <span>看第 1 页原图</span>
+                      </button>
+                    </div>
+                    <div class="ev-box">
+                      <strong><span class="role-tag is-user">我</span> → <span class="role-tag">AI</span> C02 原对话节选</strong>
+                      <pre>我：杠杆是啥，我没玩过股票也因不懂一些，这些是讲人生道理的还是金融的先回答我
+
+AI：这两页图讲的是人生道理和个人成长思维，不是在教你炒股或搞金融。这个词最原始的意思就是物理里的撬棍……</pre>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </article>
+
+          <!-- J02 -->
+          <article id="j02" class="j-card" data-keywords="J02 无需许可 permissionless 无息 边际复制成本为零 代码 媒体 包子铺 小软件 减脂餐 机器人军团">
+            <div class="j-top">
+              <div class="j-title-group">
+                <span class="j-id">J02</span>
+                <h3>普通人破局要优先抓「无需许可」且「边际复制成本为零」的新型杠杆</h3>
+              </div>
+              <span class="j-cites">S01 · S02 · C03 · C04</span>
+            </div>
+            <div class="j-conclusion">
+              <span class="role-tag">作者</span> 传统人力与资本必须先获得他人同意，而代码和媒体不需要任何人批准、且每多服务一个人的边际复制成本趋近于零，是普通人最值得优先掌握的杠杆。
+            </div>
+
+            <div class="drawer-pair">
+              <details class="inline-drawer arg-drawer">
+                <summary>展开论证：为什么成立 · 边界或反例 · 关键例子</summary>
+                <div class="drawer-content">
+                  <h4>为什么成立</h4>
+                  <ul>
+                    <li><span class="role-tag">作者</span> 人力杠杆须有人愿追随你，资本杠杆须有人愿交钱给你；过去普通人缺名气缺钱，很难过「求人点头」这关。</li>
+                    <li><span class="role-tag">作者</span> 代码、写书、播客、推文、视频同时具备两重威力：一是<strong>无需许可（Permissionless）</strong>，不用老板审批或投资人签字即可开工；二是<strong>边际复制成本为零</strong>，做好一次后服务 100 人还是 100 万人不再多花同等原料与体力。写完代码就像拥有夜间连夜干活的「机器人军团」。</li>
+                  </ul>
+                  <div class="boundary-note">
+                    <strong>边界或反例：</strong><span class="role-tag">AI</span> 「边际复制成本为零」不等于「总成本为零」：前期打磨一条好视频、写通代码仍需大量时间投入。且自媒体进入具体平台后，虽然启动创作无需许可，分发曝光仍受平台算法与社区规则约束。
+                  </div>
+                  <h4>关键例子（假设对比场景）</h4>
+                  <p><span class="role-tag">AI</span> 开包子铺每多卖 1 个包子就得重揉 1 份面和肉；而花一周写好自动背单词工具或拍一条减脂餐食谱视频，发上网后无论来 1 人还是 100 万人，都不必多炒一盘菜或重写一遍代码。</p>
+                </div>
+              </details>
+
+              <details class="inline-drawer src-drawer">
+                <summary>就地对照原文与对话（S01 · S02 · C04）</summary>
+                <div class="drawer-content">
+                  <div class="evidence-grid">
+                    <div class="ev-box">
+                      <strong><span class="role-tag">作者</span> S01 · Use permissionless leverage</strong>
+                      <pre>• The most interesting and the most important form of leverage is this idea of products that have no marginal cost of replication.
+• They don't require somebody else's permission for you to use them or succeed.</pre>
+                      <button type="button" class="ev-thumb-btn" data-zoom-src="./raw/source_01.jpg" data-zoom-title="S01 · 英文笔记第 1 页">
+                        <img src="./raw/source_01.jpg" alt="S01 缩略图" width="1280" height="1463" loading="eager">
+                        <span>看第 1 页原图</span>
+                      </button>
+                    </div>
+                    <div class="ev-box">
+                      <strong><span class="role-tag is-user">我</span> → <span class="role-tag">AI</span> C04 原对话节选</strong>
+                      <pre>我：第一点是那个无息许可的杠杆这个你讲得不太清楚……
+
+AI：图里说的不是和借钱利息有关的“无息”，而是“无需许可”（Permissionless）——不需要经过任何人的批准和同意。每多卖出一份几乎不再多花钱和力气。</pre>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </article>
+
+          <!-- J03 -->
+          <article id="j03" class="j-card" data-keywords="J03 魔法组合 三种杠杆 叠加 人力 资本 咖啡店 15人 效率App Instagram 科技创业">
+            <div class="j-top">
+              <div class="j-title-group">
+                <span class="j-id">J03</span>
+                <h3>单个杠杆各有天花板，科技创业的超额爆发来自「三种杠杆的魔法组合」</h3>
+              </div>
+              <span class="j-cites">S02 · C03 · C04</span>
+            </div>
+            <div class="j-conclusion">
+              <span class="role-tag">作者</span> 仅凭单一种类杠杆往往难以兼顾轻资产扩张与海量交付；把「极精干的精英人力 + 大量代码与媒体内容 + 用于营销扩张的资本」叠加成乘法组合，才是科技初创公司爆发的原因。
+            </div>
+
+            <div class="drawer-pair">
+              <details class="inline-drawer arg-drawer">
+                <summary>展开论证：为什么成立 · 边界或反例 · 关键例子</summary>
+                <div class="drawer-content">
+                  <h4>为什么成立</h4>
+                  <ul>
+                    <li><span class="role-tag">AI</span> 单用都会撞墙：只靠人力，扩编带来管理摩擦与薪资暴涨；只靠资本，缺乏好产品与传播只是烧钱；只靠个人无许可杠杆单干，单人研发运营精力有上限。</li>
+                    <li><span class="role-tag">作者</span> 科技公司的叠法：只招人数最少但产出最高的顶尖人才（工程师、设计师、产品人），产出零成本复制的代码并铺开媒体声量，再把融资砸向营销、广告和扩张。</li>
+                  </ul>
+                  <div class="boundary-note">
+                    <strong>边界或反例：</strong><span class="role-tag">AI</span> 「魔法组合」适合已跑通产品方向、准备 1→10000 扩张的团队；零基础个人在 0→1 摸索期若过早引入资本与员工，反而容易被管理成本拖垮。
+                  </div>
+                  <h4>关键例子</h4>
+                  <p><span class="role-tag">AI</span>（假设对比）传统连锁咖啡店想服务 1000 万人得租几千家门店、雇几万人、熬五到十年；而 15 名顶尖人员组成的效率 App 公司，代码装进 1000 万部手机，创始人播客攒铁粉，跑通后融钱全网投广告扩服务器，半年即可拉爆用户。（第 3 轮 AI 亦引用早期 Instagram 仅十几人服务数千万用户的案例，具体数字待核对。）</p>
+                </div>
+              </details>
+
+              <details class="inline-drawer src-drawer">
+                <summary>就地对照原文与对话（S02 · C04）</summary>
+                <div class="drawer-content">
+                  <div class="evidence-grid">
+                    <div class="ev-box">
+                      <strong><span class="role-tag">作者</span> S02 · Combine all three kinds</strong>
+                      <pre>• ...where you take just the minimum, but highest output labor that you can get... Then you add in capital. You use that for marketing, advertising, scaling. You add in lots of code and media...</pre>
+                      <button type="button" class="ev-thumb-btn" data-zoom-src="./raw/source_02.jpg" data-zoom-title="S02 · 英文笔记第 2 页">
+                        <img src="./raw/source_02.jpg" alt="S02 缩略图" width="1280" height="1463" loading="eager">
+                        <span>看第 2 页原图</span>
+                      </button>
+                    </div>
+                    <div class="ev-box">
+                      <strong><span class="role-tag is-user">我</span> → <span class="role-tag">AI</span> C04 原对话节选</strong>
+                      <pre>我：以及三种杠杆结合形成的魔法组合这个也再延伸详细一点。
+
+AI：单用任何一种杠杆都有天花板……“无需许可的杠杆”解决 0 到 1 起步；“魔法组合”解决小团队从 1 爆发到 10000。</pre>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </article>
+
+          <!-- J04 -->
+          <article id="j04" class="j-card" data-keywords="J04 专长知识 specific knowledge 判断力 judgment 好奇心 培训 慢下来 自行车 巨轮 审美">
+            <div class="j-top">
+              <div class="j-title-group">
+                <span class="j-id">J04</span>
+                <h3>决定最终归属和上限的不是苦力，而是不可培训的「专长知识」与后期「判断力」</h3>
+              </div>
+              <span class="j-cites">S01 · S02 · C01 · C03</span>
+            </div>
+            <div class="j-conclusion">
+              <span class="role-tag">作者</span> 规模化赚钱不仅靠杠杆，更靠「专长知识」决定钱流向你而非别人；而在近乎无限杠杆的时代，前半段要拼命奔跑拿杠杆，拿到杠杆后反而要放慢脚步，因为决定成败的是「判断力」。
+            </div>
+
+            <div class="drawer-pair">
+              <details class="inline-drawer arg-drawer">
+                <summary>展开论证：为什么成立 · 边界或反例 · 关键例子</summary>
+                <div class="drawer-content">
+                  <h4>为什么成立</h4>
+                  <ul>
+                    <li><span class="role-tag">作者</span> <strong>专长知识教不会、但能学会</strong>：能靠报班培训出来的技能，别人也能花钱学会替代你。真正的专长顺着天赋、好奇心与热爱长出来，常位于知识边缘——不是 100% 投入的人会被 100% 投入的人轻松击败。</li>
+                    <li><span class="role-tag">作者</span> <strong>杠杆越高，判断越贵</strong>：前期一切努力都在为施展判断力铺路，经得起验证的判断力与公信力至关重要。执行已被放大，方向错一次损失同样会被成倍放大。</li>
+                  </ul>
+                  <div class="boundary-note">
+                    <strong>边界或反例：</strong><span class="role-tag">AI</span> 不否定基础技能（外语、剪辑、基础语法）的入门底座价值，只是不能指望标准证书当长期护城河；另外「放慢脚步」的前提是已握有杠杆，零杠杆前期过度空想反而误事。
+                  </div>
+                  <h4>关键例子（假设对比与类比）</h4>
+                  <p><span class="role-tag">AI</span> 两周培训班能考下的办公软件证书不算专长，而「一眼看出产品哪里别扭的审美直觉」只能在摸索中悟出来。没杠杆时像骑自行车，拐错最多蹭破皮；手握百万粉丝或大流量软件时像开满载巨轮，方向盘偏一点后果就极严重。</p>
+                </div>
+              </details>
+
+              <details class="inline-drawer src-drawer">
+                <summary>就地对照原文与对话（S01 · S02 · C03）</summary>
+                <div class="drawer-content">
+                  <div class="evidence-grid">
+                    <div class="ev-box">
+                      <strong><span class="role-tag">作者</span> S01 &amp; S02 原文核心句</strong>
+                      <pre>• If you can be trained for it... then somebody else can be trained for it too.
+• The first part of your career's spent hustling to get leverage. Once you have the leverage, then you wanna slow down a bit, because your judgment really matters.</pre>
+                      <button type="button" class="ev-thumb-btn" data-zoom-src="./raw/source_02.jpg" data-zoom-title="S02 · 英文笔记第 2 页">
+                        <img src="./raw/source_02.jpg" alt="S02 缩略图" width="1280" height="1463" loading="eager">
+                        <span>看第 2 页原图</span>
+                      </button>
+                    </div>
+                    <div class="ev-box">
+                      <strong><span class="role-tag">AI</span> C03 举例节选</strong>
+                      <pre>没有杠杆时就像骑自行车——方向拐错了最多蹭破点皮；当你手握百万粉丝或大流量软件时，就像开满载货物的巨轮，越往后越拼谁看方向更准。</pre>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </article>
+
+          <!-- J05 -->
+          <article id="j05" class="j-card" data-keywords="J05 承担责任 accountability 自媒体 开始 建议 同行者 踩坑 副产品 10条 日更 周更">
+            <div class="j-top">
+              <div class="j-title-group">
+                <span class="j-id">J05</span>
+                <h3>零起点只能先主动「承担责任」，在公开交付中换判断力，再借自媒体低门槛启动</h3>
+              </div>
+              <span class="j-cites">S02 · C03 · C05</span>
+            </div>
+            <div class="j-conclusion">
+              <span class="role-tag">作者</span> 专长和杠杆都需要时间攒，但「承担责任」今天就能立刻做；<span class="role-tag">AI</span> 落到零基础做自媒体上，核心不是等准备好去当老师讲课，而是挑阻力最小的媒介，把本来就在折腾的事公开记录下来，用市场反馈低成本练出判断力。
+            </div>
+
+            <div class="drawer-pair">
+              <details class="inline-drawer arg-drawer">
+                <summary>展开论证：为什么成立 · 边界或反例 · 关键例子</summary>
+                <div class="drawer-content">
+                  <h4>为什么成立</h4>
+                  <ul>
+                    <li><span class="role-tag">作者</span> 必须先主动担责、把个人信誉押上牌桌（putting your neck on the chopping block），把自己放进必须决策交付的位置，才能在实战里熬出判断力，换取社会回馈的杠杆。</li>
+                    <li><span class="role-tag">AI</span> 用固定账号发内容是低风险公开担责：不用先买相机搭灯光，观众往往更爱看「只比自己领先两步的同行者」的真实踩坑对比；前期数据惨淡就是免费校准网感与判断力的学费。</li>
+                  </ul>
+                  <div class="boundary-note">
+                    <strong>边界或反例：</strong><span class="role-tag">AI</span> 担责指交付可承受范围内的真实结果，不是盲目揽下超出能力底线的高危任务；自媒体起步切忌立「日更」Flag 导致断更弃坑，每周稳产 1～2 条反而更容易跑满半年复利。
+                  </div>
+                  <h4>关键例子</h4>
+                  <p><span class="role-tag">作者</span> 主动接手「没人愿意管的事」并署名负责。<span class="role-tag">AI</span>（假设对比）发空泛的「怎么保持自律」容易被划走；写成「我用这三个具体动作，把每天无意识刷手机的时间砍掉了一半」或「新手上手某工具最容易踩的 4 个雷」，细节自带收藏价值。</p>
+                </div>
+              </details>
+
+              <details class="inline-drawer src-drawer">
+                <summary>就地对照原文与对话（S02 · C05）</summary>
+                <div class="drawer-content">
+                  <div class="evidence-grid">
+                    <div class="ev-box">
+                      <strong><span class="role-tag">作者</span> S02 · Take accountability first</strong>
+                      <pre>• Accountability is something you can take on immediately.
+• When you take on accountability, you're also publicly putting your neck on the chopping block, so you have to deliver.</pre>
+                      <button type="button" class="ev-thumb-btn" data-zoom-src="./raw/source_02.jpg" data-zoom-title="S02 · 英文笔记第 2 页">
+                        <img src="./raw/source_02.jpg" alt="S02 缩略图" width="1280" height="1463" loading="eager">
+                        <span>看第 2 页原图</span>
+                      </button>
+                    </div>
+                    <div class="ev-box">
+                      <strong><span class="role-tag is-user">我</span> → <span class="role-tag">AI</span> C05 原对话节选</strong>
+                      <pre>我：自媒体的内容鼓励我应该如何开始以及有什么建议呢
+
+AI：把你本来就在折腾的事顺手记录下来……给自己定一个“先发满 10 条”的死命令；用“同行者踩坑”替代“老师讲课”；每周稳定产出 1 到 2 条。</pre>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </article>
+        </div>
+
+        <!-- 专题补充对照表 -->
+        <div class="table-scroll" aria-label="三种杠杆对比表">
+          <table class="ed-table">
+            <thead>
+              <tr>
+                <th>杠杆类型</th>
+                <th>是否需要许可</th>
+                <th>边际复制成本</th>
+                <th>单用主要瓶颈</th>
+                <th>魔法组合角色</th>
+                <th>个人优先级</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>代码与媒体（新型）</td>
+                <td>无需许可：电脑与账号即可开工</td>
+                <td>趋近于零：做一次可无限分发</td>
+                <td>单人研发、设计、运营精力有限</td>
+                <td>核心武器与大喇叭</td>
+                <td>最高（0→1 首选）</td>
+              </tr>
+              <tr>
+                <td>劳动力（传统）</td>
+                <td>需要许可：须有人愿追随你</td>
+                <td>较高：产量与人力薪资线性绑死</td>
+                <td>人员越多沟通管理损耗越大</td>
+                <td>极精干精英特种部队</td>
+                <td>较低（单人跑通再说）</td>
+              </tr>
+              <tr>
+                <td>资本（传统）</td>
+                <td>需要许可：须有出资方信任</td>
+                <td>资金有限，依赖后续转化回报</td>
+                <td>无好产品与传播时烧钱不见响</td>
+                <td>砸向营销扩张的航空燃油</td>
+                <td>延后（先证判断力）</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 5. 续聊停点与待决策 -->
+      <section id="resume" class="sec" aria-labelledby="resume-h">
+        <div class="sec-head">
+          <span class="sec-num">05</span>
+          <h2 id="resume-h">续聊停点与待决策提案</h2>
+        </div>
+
+        <div class="resume-card">
+          <p><span class="role-tag is-user">我</span> <strong>最后的具体问题：</strong>「自媒体的内容鼓励我应该如何开始以及有什么建议呢」（C05·我）</p>
+          <ul>
+            <li><strong>已明确的偏好与选择：</strong>已排除金融炒股误解，确认按人生价值放大逻辑理解（C02）；在代码与自媒体之间，当前聚焦「自媒体内容」起步（C05）。</li>
+            <li><strong>尚未敲定的问题：</strong>还没选定平时爱折腾的 2～3 个具体主题、图文短帖还是手机口播媒介，以及初期数据惨淡时的复盘维度。</li>
+          </ul>
+
+          <div class="proposal-callout">
+            <h3><span class="role-tag is-proposal">待决策</span> 核心启动提案：「先发满 10 条」死命令</h3>
+            <p>用固定账号公开发声，前 10 条不盯播放量焦虑，唯一目标是跑通「找选题 → 梳理表达 → 发布 → 看反馈」最小闭环；配套建议包括写成「同行者踩坑笔记」、挑阻力最小媒介直接发第一条、以每周 1～2 条取代「日更」Flag。（C05·AI）</p>
+          </div>
+
+          <div>
+            <strong><span class="role-tag">AI</span> 可从这里接着聊：</strong>
+            <ol style="margin-top: 6px;">
+              <li>挑出 2～3 个平时本来就爱折腾、跟朋友聊起来停不下来的主题；</li>
+              <li>选定文字短帖（小红书/知乎/即刻/公众号）或手机口播中的一种最小阻力媒介；</li>
+              <li>拍板是否采纳「先发满 10 条（周更 1～2 条）」，直接拆出第 1～3 条标题和提纲。</li>
+            </ol>
+          </div>
+
+          <div>
+            <button type="button" class="btn-ghost" id="copy-resume-btn">复制续聊开场白</button>
+            <span class="copy-feedback" id="resume-status" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. 底部完整原材料库（默认折叠） -->
+      <section id="raw-archive" class="sec" aria-labelledby="raw-h">
+        <div class="sec-head">
+          <span class="sec-num">06</span>
+          <h2 id="raw-h">完整原材料库（默认折叠）</h2>
+        </div>
+        <p class="sec-sub">需要逐字核对原文扫描件或重读 5 轮完整上下文时在此展开。</p>
+
+        <div class="raw-accordion">
+          <details id="raw-sources-details">
+            <summary>
+              <span>英文笔记原图与逐页完整转录（S01 / S02）</span>
+              <span class="summary-meta">./raw/source_01.jpg · source_02.jpg</span>
+            </summary>
+            <div class="details-body">
+              <div class="source-grid">
+                <div class="source-box" id="source-s01">
+                  <h3>S01 · 第 1 页（点击图片放大）</h3>
+                  <button type="button" class="img-zoom-btn" data-zoom-src="./raw/source_01.jpg" data-zoom-title="S01 · Naval Ravikant on how to build leverage（第 1 页）">
+                    <img src="./raw/source_01.jpg" alt="Naval Ravikant on how to build leverage 英文笔记第 1 页原图" width="1280" height="1463">
+                  </button>
+                  <pre class="transcript-box" tabindex="0">Naval Ravikant on how to build leverage
+
+Get paid at scale
+• If you want to make money you have to get paid at scale.
+• And why you, that's accountability, at scale, that's leverage, and just you getting paid as opposed to somebody else getting paid, that's specific knowledge.
+
+Specific knowledge cannot be taught
+• And it's not true that everything can be taught. In fact, the most interesting things cannot be taught.
+• But everything can be learned.
+• The first thing to notice about specific knowledge is that you can't be trained for it.
+• If you can be trained for it, if you can go to a class and learn specific knowledge, then somebody else can be trained for it too.
+
+Follow your curiosity
+• So, specific knowledge is found much more by pursuing your innate talents, your genuine curiosity, and your passion.
+• It's not by going to school for whatever is the hottest job, it's not for going into whatever field investors say is the hottest.
+• Very often specific knowledge is at the edge of knowledge. It's also stuff that's just being figured out or is really hard to figure out.
+• So, if you're not 100% into it somebody else who is 100% into it will outperform you.
+
+Go and obtain leverage
+• We are now living in an age of nearly infinite leverage, and all the great fortunes are created through leverage.
+• Your first job is to go and obtain leverage, and you can obtain leverage through permission by getting people to work for you, or by raising capital.
+• Or you can get leverage permissionlessly by learning how to code or becoming good communicator and podcasting, broadcasting, creating videos, writing, etc.
+
+Use permissionless leverage
+• The most interesting and the most important form of leverage is this idea of products that have no marginal cost of replication. This is the new form of leverage.
+• Now, you can multiply your efforts without having to involve other humans and without needing money from other humans.
+• Probably the most interesting thing to keep in mind about the new forms of leverage is they are permissionless. They don't require somebody else's permission for you to use them or succeed.
+• Coding, writing books, recording podcasts, tweeting, YouTubing, these kinds of things, these are permissionless.
+• For labor leverage, somebody has to decide to follow you. For capital leverage, somebody has to give you money to invest or to turn into a product.</pre>
+                </div>
+
+                <div class="source-box" id="source-s02">
+                  <h3>S02 · 第 2 页（点击图片放大）</h3>
+                  <button type="button" class="img-zoom-btn" data-zoom-src="./raw/source_02.jpg" data-zoom-title="S02 · Naval Ravikant on how to build leverage（第 2 页）">
+                    <img src="./raw/source_02.jpg" alt="Naval Ravikant on how to build leverage 英文笔记第 2 页原图" width="1280" height="1463">
+                  </button>
+                  <pre class="transcript-box" tabindex="0">Learn to command the robots
+• This is why I tell people learn to code.
+• Every great software developer, for example, now has an army of robots working for him at nighttime, while he or she sleeps, after they've written the code and it's just cranking away.
+• Coding is such a great superpower because now you can speak the language of the robot armies and you can tell them what to do.
+
+Combine all three kinds
+• Now, the beauty is when you combine all of these three.
+• That's where tech startups really excel, where you take just the minimum, but highest output labor that you can get, which are engineers, and designers, product developers. Then you add in capital. You use that for marketing, advertising, scaling. You add in lots of code and media and podcasts and content to get it all out there.
+• That is a magic combination, and that's why you see technology startups explode out of nowhere, use massive leverage and just make huge outsize returns.
+
+Judgment becomes the skill
+• In an age of infinite leverage, judgment becomes the most important skill.
+• The first part of your career's spent hustling to get leverage. Once you have the leverage, then you wanna slow down a bit, because your judgment really matters.
+• Ultimately, everything else that you do is actually setting you up to apply your judgment.
+• Demonstrated judgment, credibility around the judgment, is so critical.
+
+Take accountability first
+• Accountability is something you can take on immediately.
+• You can say, "Hey, I'll take charge of this thing that nobody wants to take charge of."
+• When you take on accountability, you're also publicly putting your neck on the chopping block, so you have to deliver.
+
+Build judgment through experience
+• Judgment takes experience. It takes a lot of time to build up.
+• You have to put yourself in positions where you can exercise judgment. That'll come from taking on accountability.
+• Leverage is something that society gives you after you've demonstrated judgment.
+• You can get it faster by learning high-leverage skills like coding or working with the media.</pre>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details id="raw-chat-details">
+            <summary>
+              <span>完整五轮对话记录（C01 – C05）</span>
+              <span class="summary-meta">./raw/chat_raw.md</span>
+            </summary>
+            <div class="details-body">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px; font-size:13px; color:var(--ink-3);">
+                <span>完整保留五轮逐字原话</span>
+                <button type="button" class="btn-ghost" id="toggle-all-rounds" aria-expanded="false">展开全部 5 轮</button>
+              </div>
+
+              <details class="chat-round" id="round-c01">
+                <summary>C01 · 初读两页图：请 AI 带我了解并解读其中观点</summary>
+                <div class="round-body">
+                  <div class="turn is-user"><div class="turn-head"><span class="role-tag is-user">我</span> 第 1 轮</div><pre>（附两张图片：《Naval Ravikant on how to build leverage》英文笔记第 1、2 页）
+带我了解里面的观点，解读</pre></div>
+                  <div class="turn"><div class="turn-head"><span class="role-tag">AI</span> 第 1 轮</div><pre>这两页笔记浓缩了硅谷著名投资人纳瓦尔·拉维坎特（Naval Ravikant）关于如何构建杠杆（Leverage）的核心财富哲学。整套逻辑围绕一个核心命题展开：想要赚大钱，不能靠出卖单位时间，而必须实现“规模化变现”，这需要专长知识、责任担当、杠杆工具以及最终的**判断力**协同运作。
+
+### 一、规模化赚钱的三大基石
+纳瓦尔将“规模化获得报酬（Get paid at scale）”拆解为三个递进的问题，对应三种核心要素：
+* **责任担当（Accountability）—— 解决“为什么是你”**：主动站在台前承担结果，用个人声誉做背书。
+* **杠杆（Leverage）—— 解决“如何规模化”**：借助外部工具或资源，将你的单次努力成倍放大。
+* **专长知识（Specific Knowledge）—— 解决“为什么钱给你而不是别人”**：你拥有别人难以替代的独特能力。
+
+关于**专长知识**，笔记里有一个非常反直觉的观点：它无法被“教”会，但可以被“学”会。
+* **警惕标准化培训**：如果一项技能可以通过报班、上课接受培训获得，那就意味着别人同样可以被培训出来，你也就随时可能被替代。
+* **追随天赋与真正的好奇心**：专长知识不是去追逐当下最热门的工作或投资人吹捧的风口，而是顺着你的天赋、热情和真正的好奇心去探索。
+* **身处知识边缘**：这类知识往往位于行业前沿，或者是正在被摸索、极难攻克的领域。正因如此，如果你不是 100% 全情投入，那些真正热爱且 100% 投入的人就会轻易打败你。
+
+### 二、杠杆的分类与“无许可杠杆”的威力
+我们正处于一个“近乎无限杠杆”的时代，历史上所有的巨大财富本质上都是杠杆的产物。纳瓦尔将杠杆分为**需要许可的传统杠杆**（劳动力杠杆、资本杠杆）和**无需许可的新型杠杆**（代码与媒体，边际复制成本为零）。
+1. **用代码“指挥机器人军团”**：写完代码后就相当于拥有了一支不知疲倦的机器人大军，即使睡觉时也在连夜运转干活。
+2. **三重杠杆的“魔法组合”**：组建人数最少但产出最高的精英团队（劳动力），注入资金用于营销扩张（资本），再叠加大量代码、媒体、播客和内容分发到全世界（无许可杠杆）。
+
+### 三、普通人的破局路线：从担责到判断力
+1. **第一步：立刻承担责任（Take accountability first）**
+2. **第二步：在实战中打磨判断力（Build judgment through experience）**
+3. **第三步：用判断力换取社会杠杆，然后慢下来**
+
+结合你目前的职业或兴趣，你觉得自己目前最容易从哪种“无许可杠杆”（比如写作、视频、播客或技术工具）切入来放大自身价值？</pre></div>
+                </div>
+              </details>
+
+              <details class="chat-round" id="round-c02">
+                <summary>C02 · 概念澄清：没玩过股票，这讲的是人生道理还是金融？</summary>
+                <div class="round-body">
+                  <div class="turn is-user"><div class="turn-head"><span class="role-tag is-user">我</span> 第 2 轮</div><pre>杠杆是啥，我没玩过股票也因不懂一些，这些是讲人生道理的还是金融的先回答我</pre></div>
+                  <div class="turn"><div class="turn-head"><span class="role-tag">AI</span> 第 2 轮</div><pre>先直接回答你：**这两页图讲的是人生道理和个人成长思维（核心是“怎么高效创造价值和赚钱”），不是在教你炒股或搞金融。**
+
+作者只是借用了“杠杆”这个词来打比方，完全不懂股票也一点不妨碍看懂它。
+
+**“杠杆”到底是什么？**
+这个词最原始的意思，就是初中物理里的**撬棍**——用很小的力气，撬动很重的石头，也就是“四两拨千斤”：
+* **金融/股票里的杠杆（你不用担心这个）**：指的是“借钱放大本金”，风险很高。**图里讲的不是这种。**
+* **这两页图里讲的人生杠杆**：指的是“把你个人努力成倍放大的工具”。
+
+**打个最直白的比方：**
+* **没有杠杆的生活（纯卖时间）**：就像按小时打零工，干 1 小时拿 1 小时的钱。收入天花板被死死锁住了。
+* **有杠杆的生活（放大结果）**：借助人力杠杆（自己一天摇 50 杯奶茶 vs 雇 10 个人）、资本杠杆（让钱替你干活）、代码和媒体杠杆（花一个月写个好用的小软件或录一条爱看的视频，睡觉时全世界几万人同时用/看）。
+
+刚才图里还有哪个词（比如“专长知识”或者“判断力”）觉得听起来比较抽象的，可以挑出来我继续用大白话给你解释。</pre></div>
+                </div>
+              </details>
+
+              <details class="chat-round" id="round-c03">
+                <summary>C03 · 全局串讲：从头到尾讲清道理、多举例子并做总结</summary>
+                <div class="round-body">
+                  <div class="turn is-user"><div class="turn-head"><span class="role-tag is-user">我</span> 第 3 轮</div><pre>现在开始从头到尾的给我讲解其中道理并且据一些例子帮我更好的理解，最后还得总结</pre></div>
+                  <div class="turn"><div class="turn-head"><span class="role-tag">AI</span> 第 3 轮</div><pre>这两页笔记其实是一套环环相扣的“个人价值放大路线图”：
+### 一、赚钱的底层公式与“专长知识”
+* 为什么是你？靠责任担当；怎么做到规模化？靠杠杆；为什么钱流向你？靠专长知识。
+* 1. 它教不会，但能学会（例子：考办公软件证书 vs 产品审美直觉、把枯燥技术讲成大白话的表达力）。
+* 2. 它藏在好奇心和知识边缘里（例子：跟风应付 vs 半夜兴致勃勃研究前沿）。
+
+### 二、获取杠杆：从“求人批准”到“指挥机器人”
+* 例子：会做减脂餐，开连锁店得求投资人打钱招员工；拍成食谱短视频或写热量计算工具，不用求人批准，100 万人看也不用多炒一盘菜。
+* 用代码指挥机器人军团（自动背单词软件）；三种杠杆叠成魔法组合（早期 Instagram 十几人团队服务几千万用户）。
+
+### 三、判断力与慢下来
+* 例子：没有杠杆时像骑自行车，拐错最多蹭破皮；手握百万粉丝或大流量软件时像开满载货物的巨轮，看方向比熬夜更重要。
+
+### 四、零基础第一步：承担责任
+* 例子：接手没人愿碰的硬骨头并署名；从零发视频或写小软件直面真实用户反馈，踩坑练出判断力，社会自然回馈杠杆。
+
+这四个环节里，你现在听完最有共鸣、或者最想先在自己生活里试一试的是哪一步？</pre></div>
+                </div>
+              </details>
+
+              <details class="chat-round" id="round-c04">
+                <summary>C04 · 追问卡点：纠偏「无需许可」与深挖「魔法组合」</summary>
+                <div class="round-body">
+                  <div class="turn is-user"><div class="turn-head"><span class="role-tag is-user">我</span> 第 4 轮</div><pre>我有两个地方不太懂，第一点是那个无息许可的杠杆这个你讲得不太清楚，然后以及三种杠杆结合形成的魔法组合这个也再延伸详细一点。</pre></div>
+                  <div class="turn"><div class="turn-head"><span class="role-tag">AI</span> 第 4 轮</div><pre>先帮你纠正一个很容易看混的小词：图里说的不是和借钱利息有关的“无息”，而是**“无需许可”（Permissionless）**——也就是不需要经过任何人的批准和同意。
+
+### 一、什么是“无需许可的杠杆”？
+1. 不用求任何人批准就能干；
+2. 核心秘密在于“边际复制成本为零”：对比包子铺（每多卖 1 个都要买面粉肉重新揉面）vs 写小软件/拍干货视频（做好后 1 个人用和 100 万人用几乎不再多花成本）。
+
+### 二、三种杠杆怎么叠出“魔法组合”？
+单用任何一种杠杆都有天花板：
+* 1. 人力杠杆：最精简的“特种部队”（极少但高产的工程师、设计师、产品开发者）；
+* 2. 代码与媒体：零成本的“核心武器+大喇叭”；
+* 3. 资本杠杆：猛踩油门的“航空燃油”（砸向营销广告与扩张）。
+对比：传统连锁咖啡店服务 1000 万人要租几千门店雇几万人；15 人效率 App 科技小公司代码装进 1000 万部手机，配合播客短视频与资本投放半年拉爆。
+
+“无需许可的杠杆”解决普通人从 0 到 1 起步，“魔法组合”解决小团队从 1 爆发到 10000。如果你设想做一个小项目，“代码工具”和“自媒体内容”哪一种更贴近你平时喜欢折腾的事？</pre></div>
+                </div>
+              </details>
+
+              <details class="chat-round" id="round-c05">
+                <summary>C05 · 落到行动：选中自媒体内容，询问如何开始及建议（停点）</summary>
+                <div class="round-body">
+                  <div class="turn is-user"><div class="turn-head"><span class="role-tag is-user">我</span> 第 5 轮</div><pre>自媒体的内容鼓励我应该如何开始以及有什么建议呢</pre></div>
+                  <div class="turn"><div class="turn-head"><span class="role-tag">AI</span> 第 5 轮</div><pre>核心是“把你本来就在折腾的事顺手记录下来”，而不是硬着头皮去演一个无所不知的专家。
+
+**第一步该怎么启动（三步跑通最小闭环）**
+1. 顺着真实好奇心选方向，让内容成为生活的“副产品”。
+2. 挑阻力最小的媒介，把发布门槛降到最低（文字短帖或手机口播，不拖一两个月买设备）。
+3. 给自己定一个“先发满 10 条”的死命令，前 10 条不盯播放量焦虑，只跑通“找选题 → 梳理表达 → 发布 → 看反馈”。
+
+**少走弯路的几条实用建议**
+* 用“同行者踩坑”替代“老师讲课”；
+* 具体胜过宏大（如“用三个具体动作把刷手机时间砍半”）；
+* 把前期数据惨淡当成练“判断力”的免费学费；
+* 先保住节奏（每周稳定 1 到 2 条），再谈爆款。
+
+如果现在让你挑 2 到 3 个平时本来就爱折腾、跟朋友聊起来停不下来的主题，你会最先想到哪几个？</pre></div>
+                </div>
+              </details>
+            </div>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <span>个人认知沉淀 · 底稿 <a href="./index.md">index.md</a> · <a href="./Naval的杠杆·认知精华.pdf">认知精华.pdf</a> · <a href="./Naval的杠杆·纯英文原文.pdf">纯英文原文.pdf</a> · <a href="./Naval的杠杆·纯中文原文.pdf">纯中文原文.pdf</a> · <a href="./Naval的杠杆·中英原文.pdf">中英原文.pdf</a></span>
+      <span>离线单文件操作台 · 原图走本地相对路径</span>
+    </footer>
+  </div>
+
+  <!-- 原图灯箱 -->
+  <dialog class="lightbox" id="image-lightbox" closedby="any" aria-labelledby="lightbox-title">
+    <div class="lightbox-bar">
+      <strong id="lightbox-title" style="font-size:14px;">原图查看</strong>
+      <button type="button" class="btn-ghost" id="lightbox-close-btn">关闭 (Esc)</button>
+    </div>
+    <div class="lightbox-body">
+      <img id="lightbox-img" src="" alt="">
+    </div>
+  </dialog>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const cards = Array.from(document.querySelectorAll(".j-card"));
+      const argDrawers = Array.from(document.querySelectorAll(".arg-drawer"));
+      const modeBrief = document.getElementById("mode-brief");
+      const modeFull = document.getElementById("mode-full");
+      const searchInput = document.getElementById("wb-search");
+      const searchClear = document.getElementById("wb-search-clear");
+      const filterCount = document.getElementById("wb-filter-count");
+      const emptySearch = document.getElementById("empty-search");
+
+      // 1. 速览模式 vs 精读全展
+      function setViewMode(isFull) {
+        modeBrief.setAttribute("aria-pressed", String(!isFull));
+        modeFull.setAttribute("aria-pressed", String(isFull));
+        argDrawers.forEach((d) => {
+          d.open = isFull;
+        });
+      }
+
+      modeBrief.addEventListener("click", () => setViewMode(false));
+      modeFull.addEventListener("click", () => setViewMode(true));
+
+      // 2. 关键词实时检索过滤
+      function applyFilter() {
+        const q = searchInput.value.trim().toLowerCase();
+        searchClear.classList.toggle("is-visible", q.length > 0);
+        let visible = 0;
+
+        cards.forEach((card) => {
+          const text = (card.getAttribute("data-keywords") + " " + card.textContent).toLowerCase();
+          const match = !q || text.includes(q);
+          card.hidden = !match;
+          if (match) {
+            visible += 1;
+            if (q) {
+              const drawer = card.querySelector(".arg-drawer");
+              if (drawer) drawer.open = true;
+            }
+          }
+        });
+
+        filterCount.textContent = `${visible} / ${cards.length} 条`;
+        emptySearch.style.display = visible === 0 ? "block" : "none";
+      }
+
+      searchInput.addEventListener("input", applyFilter);
+      searchClear.addEventListener("click", () => {
+        searchInput.value = "";
+        applyFilter();
+        searchInput.focus();
+      });
+
+      // 3. 思维导图 / 轨迹节点点击跳转到对应判断卡并展开论证
+      function jumpToCard(id) {
+        const target = document.getElementById(id);
+        if (!target) return;
+        if (target.hidden) {
+          searchInput.value = "";
+          applyFilter();
+        }
+        const arg = target.querySelector(".arg-drawer");
+        if (arg) arg.open = true;
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        target.classList.remove("is-flash");
+        void target.offsetWidth;
+        target.classList.add("is-flash");
+      }
+
+      document.querySelectorAll("[data-jump-card]").forEach((el) => {
+        const id = el.getAttribute("data-jump-card");
+        const handler = (event) => {
+          if (el.tagName === "A") event.preventDefault();
+          jumpToCard(id);
+        };
+        el.addEventListener("click", handler);
+        if (el.tagName !== "A") {
+          el.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              jumpToCard(id);
+            }
+          });
+        }
+      });
+
+      // 4. 原图放大灯箱
+      const lightbox = document.getElementById("image-lightbox");
+      const lightboxImg = document.getElementById("lightbox-img");
+      const lightboxTitle = document.getElementById("lightbox-title");
+      const lightboxClose = document.getElementById("lightbox-close-btn");
+
+      document.querySelectorAll("[data-zoom-src]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const src = btn.getAttribute("data-zoom-src");
+          const title = btn.getAttribute("data-zoom-title") || "原图查看";
+          lightboxImg.src = src;
+          lightboxImg.alt = title;
+          lightboxTitle.textContent = title;
+          if (typeof lightbox.showModal === "function") {
+            lightbox.showModal();
+          } else {
+            window.open(src, "_blank", "noopener");
+          }
+        });
+      });
+
+      lightboxClose.addEventListener("click", () => lightbox.close());
+      lightbox.addEventListener("click", (e) => {
+        if (e.target === lightbox) lightbox.close();
+      });
+
+      // 5. 展开/收起全部 5 轮对话
+      const toggleAllBtn = document.getElementById("toggle-all-rounds");
+      const rounds = Array.from(document.querySelectorAll(".chat-round"));
+
+      function syncRoundBtn() {
+        const allOpen = rounds.every((r) => r.open);
+        toggleAllBtn.setAttribute("aria-expanded", String(allOpen));
+        toggleAllBtn.textContent = allOpen ? "收起全部 5 轮" : "展开全部 5 轮";
+      }
+
+      toggleAllBtn.addEventListener("click", () => {
+        const next = !rounds.every((r) => r.open);
+        rounds.forEach((r) => { r.open = next; });
+        syncRoundBtn();
+      });
+
+      document.addEventListener("toggle", (e) => {
+        if (e.target instanceof HTMLDetailsElement && e.target.classList.contains("chat-round")) {
+          syncRoundBtn();
+        }
+      }, true);
+
+      // 6. 一键复制 30 秒口述稿 / 续聊开场白
+      async function copyText(text, statusEl, okMsg) {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+            statusEl.textContent = okMsg;
+          } else {
+            throw new Error("no clipboard");
+          }
+        } catch {
+          statusEl.textContent = "当前环境不支持自动复制，请直接对照内容使用。";
+        }
+      }
+
+      const pitchText = [
+        "Naval 讲的杠杆不是借钱炒股，而是普通人不用求人批准、靠代码或内容把一次努力放大千万倍的“睡后放大器”。",
+        "1) 凭什么钱流向你？靠培训班教不会的“专长知识”，顺着真实好奇心长出来。",
+        "2) 怎么放大？优先抓“无需许可 + 边际复制成本为零”的代码和自媒体；小团队成型后再叠精英人力与资本爆发。",
+        "3) 没资源怎么开始？先公开担责、借自媒体把本来在折腾的事记录下来，用先发满 10 条跑通最小闭环。",
+        "打个比方：开包子铺每多卖一个都要重揉一份面；写个软件或拍条食谱视频，服务 1 人和 100 万人不再多花成本。"
+      ].join("\n");
+
+      const resumeText = [
+        "我想接着上次关于《Naval 的杠杆》的讨论继续往下聊：",
+        "1) 我已明确这不是金融炒股，目前想从“自媒体内容”这个无需许可杠杆起步。",
+        "2) 上次停在第 5 轮：AI 建议把平时在折腾的事写成生活副产品，并提出“先发满 10 条（周更 1~2 条）”待我拍板。",
+        "请先帮我从平时爱折腾的方向里挑出 2~3 个主题，并确定阻力最小的媒介形式。"
+      ].join("\n");
+
+      document.getElementById("copy-pitch-btn").addEventListener("click", () => {
+        copyText(pitchText, document.getElementById("pitch-status"), "已复制 30 秒口述稿");
+      });
+
+      document.getElementById("copy-resume-btn").addEventListener("click", () => {
+        copyText(resumeText, document.getElementById("resume-status"), "已复制续聊开场白");
+      });
+    })();
+  </script>
+</body>
+</html>
