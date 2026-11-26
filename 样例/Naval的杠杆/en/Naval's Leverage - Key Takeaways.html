@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Naval's Leverage · Key Takeaways</title>
+  <style>
+    :root {
+      --bg-paper: #FFFFFF;
+      --bg-card: #FFFFFF;
+      --bg-sand: #F7F7F5;
+      --bg-table-head: #F2F1EE;
+      --border: #E5E5E2;
+      --border-strong: #CECDC7;
+
+      --ink-1: #141413;
+      --ink-2: #4A4843;
+      --ink-3: #78756E;
+
+      --accent: #B44E2D;
+      --accent-deep: #8B3A1E;
+      --accent-tint: #FBF4F0;
+      --accent-border: #E5B9A8;
+
+      --radius-lg: 12px;
+      --radius-md: 8px;
+      --radius-sm: 5px;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      max-width: 100%;
+      overflow-x: clip;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-paper);
+      color: var(--ink-1);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.68;
+      max-width: 100%;
+      overflow-x: clip;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4, p, li, pre { overflow-wrap: anywhere; }
+
+    .top-rule { height: 3px; background: var(--accent-deep); }
+
+    .workbench-bar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .workbench-inner {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 10px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bar-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px 12px;
+    }
+
+    search.filter-search {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1 1 260px;
+      min-width: 0;
+    }
+
+    .search-input-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 6px 30px 6px 10px;
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      color: var(--ink-1);
+      background: #FFFFFF;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(180, 78, 45, 0.14);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 6px;
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--ink-3);
+      font-size: 14px;
+      line-height: 1;
+      padding: 4px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .search-clear.is-visible { display: inline-block; }
+
+    .filter-count {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-3);
+      white-space: nowrap;
+    }
+
+    .mode-switch {
+      display: inline-flex;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: var(--bg-sand);
+      padding: 2px;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .mode-btn {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--ink-2);
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .mode-btn[aria-pressed="true"] {
+      background: #FFFFFF;
+      color: var(--accent-deep);
+      box-shadow: 0 1px 2px rgba(20, 20, 19, 0.08);
+    }
+
+    .anchor-nav {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .anchor-nav a {
+      text-decoration: none;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--ink-2);
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: var(--bg-sand);
+      border: 1px solid transparent;
+    }
+
+    .anchor-nav a:hover,
+    .anchor-nav a:focus-visible {
+      color: var(--accent-deep);
+      background: #FFFFFF;
+      border-color: var(--border-strong);
+      outline: none;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 28px 18px 64px;
+    }
+
+    @media (max-width: 640px) {
+      .workbench-inner { padding: 8px 14px; }
+      .container { padding: 20px 14px 48px; }
+    }
+
+    main, section, article, .details-body, .graph-wrap {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .role-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 0 6px;
+      border-radius: 4px;
+      line-height: 1.55;
+      vertical-align: baseline;
+      margin-right: 4px;
+      background: var(--bg-sand);
+      color: var(--ink-2);
+      border: 1px solid var(--border);
+    }
+
+    .role-tag.is-user {
+      background: var(--accent-tint);
+      color: var(--accent-deep);
+      border-color: var(--accent-border);
+    }
+
+    .role-tag.is-proposal {
+      background: var(--accent-tint);
+      color: var(--accent-deep);
+      border: 1px dashed var(--accent);
+    }
+
+    .article-header {
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--accent-deep);
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(1.5rem, 1.25rem + 1.3vw, 2.1rem);
+      line-height: 1.24;
+      letter-spacing: -0.015em;
+      color: var(--ink-1);
+    }
+
+    .meta-line {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 6px 14px;
+      font-size: 13px;
+      color: var(--ink-3);
+    }
+
+    .meta-links a {
+      color: var(--accent-deep);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent-border);
+    }
+
+    .meta-links a:hover { border-bottom-color: var(--accent-deep); }
+
+    .sec {
+      margin-top: 32px;
+      scroll-margin-top: 96px;
+    }
+
+    .sec-head {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .sec-num {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-deep);
+    }
+
+    .sec-head h2 {
+      margin: 0;
+      font-size: clamp(1.15rem, 1.05rem + 0.5vw, 1.35rem);
+      line-height: 1.35;
+      color: var(--ink-1);
+    }
+
+    .sec-sub {
+      margin: 0 0 14px;
+      font-size: 14px;
+      color: var(--ink-3);
+    }
+
+    .lead-box {
+      border-left: 3px solid var(--accent-deep);
+      padding: 4px 0 4px 16px;
+      margin: 0 0 18px;
+    }
+
+    .lead-box p {
+      margin: 0;
+      font-size: 15.5px;
+      color: var(--ink-1);
+    }
+
+    .lead-box p + p { margin-top: 8px; }
+
+    .trace-strip {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    @media (max-width: 740px) {
+      .trace-strip { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .trace-item {
+      background: var(--bg-paper);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 11px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .trace-item.is-stop {
+      border-style: dashed;
+      border-color: var(--accent);
+      background: var(--accent-tint);
+    }
+
+    .trace-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-3);
+    }
+
+    .trace-q {
+      font-size: 12.8px;
+      font-weight: 600;
+      color: var(--ink-1);
+      line-height: 1.4;
+    }
+
+    .trace-a {
+      font-size: 12.2px;
+      color: var(--ink-2);
+      line-height: 1.45;
+    }
+
+    .trace-jump {
+      margin-top: auto;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--accent-deep);
+      text-decoration: none;
+      align-self: flex-start;
+    }
+
+    .trace-jump:hover { text-decoration: underline; }
+
+    .graph-wrap {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+    }
+
+    .tree-desktop { display: block; width: 100%; height: auto; }
+    .tree-mobile { display: none; width: 100%; height: auto; }
+
+    @media (max-width: 700px) {
+      .tree-desktop { display: none; }
+      .tree-mobile { display: block; }
+      .graph-wrap { padding: 8px; }
+    }
+
+    .tree-node { cursor: pointer; }
+    .tree-node rect { transition: stroke 0.15s ease, fill 0.15s ease; }
+
+    .tree-node:hover rect,
+    .tree-node:focus-visible rect {
+      stroke: var(--accent);
+      fill: var(--accent-tint);
+    }
+
+    .tree-node:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .pitch-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-left: 3.5px solid var(--accent-deep);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+    }
+
+    .pitch-head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .pitch-head h3 { margin: 0; font-size: 16px; color: var(--ink-1); }
+
+    .btn-ghost {
+      appearance: none;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-paper);
+      color: var(--ink-1);
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 5px 11px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .btn-ghost:hover,
+    .btn-ghost:focus-visible {
+      border-color: var(--accent);
+      color: var(--accent-deep);
+      background: var(--accent-tint);
+      outline: none;
+    }
+
+    .pitch-lead {
+      font-size: 15.5px;
+      font-weight: 600;
+      color: var(--ink-1);
+      margin: 0 0 10px;
+    }
+
+    .pitch-list {
+      margin: 0 0 10px;
+      padding-left: 18px;
+      font-size: 14.5px;
+      color: var(--ink-2);
+    }
+
+    .pitch-list li + li { margin-top: 5px; }
+
+    .pitch-example {
+      background: var(--bg-sand);
+      border-radius: var(--radius-md);
+      padding: 9px 12px;
+      font-size: 14px;
+      color: var(--ink-1);
+    }
+
+    .copy-feedback {
+      font-size: 12.5px;
+      color: var(--accent-deep);
+      margin-left: 8px;
+    }
+
+    .judgment-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .j-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      scroll-margin-top: 96px;
+    }
+
+    .j-card[hidden] { display: none; }
+    .j-card.is-flash { animation: cardFlash 1.5s ease; }
+
+    @keyframes cardFlash {
+      0% { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(180, 78, 45, 0.22); }
+      100% { border-color: var(--border); box-shadow: none; }
+    }
+
+    .j-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 6px 12px;
+      margin-bottom: 8px;
+    }
+
+    .j-title-group {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .j-id {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      flex-shrink: 0;
+    }
+
+    .j-top h3 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.38;
+      color: var(--ink-1);
+    }
+
+    .j-cites {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--ink-3);
+    }
+
+    .j-conclusion {
+      border-left: 2.5px solid var(--accent);
+      padding: 3px 0 3px 12px;
+      margin: 6px 0 12px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink-1);
+    }
+
+    .drawer-pair {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    details.inline-drawer {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg-paper);
+      overflow: hidden;
+    }
+
+    details.inline-drawer > summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--ink-2);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    details.inline-drawer > summary::-webkit-details-marker { display: none; }
+
+    details.inline-drawer > summary::before {
+      content: "";
+      inline-size: 0.9em;
+      block-size: 0.9em;
+      flex-shrink: 0;
+      background-color: var(--accent-deep);
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='black'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E") no-repeat center / contain;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='black'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E") no-repeat center / contain;
+      rotate: -90deg;
+    }
+
+    details.inline-drawer[open] > summary {
+      color: var(--accent-deep);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-sand);
+    }
+
+    details.inline-drawer[open] > summary::before { rotate: 0deg; }
+
+    @media (prefers-reduced-motion: no-preference) {
+      details.inline-drawer > summary::before,
+      .raw-accordion summary::before {
+        transition: rotate 0.18s ease;
+      }
+      details.inline-drawer::details-content,
+      .raw-accordion details::details-content {
+        interpolate-size: allow-keywords;
+        overflow: clip;
+        contain: layout;
+        transition: block-size 0.24s ease-in-out, content-visibility 0.24s ease-in-out allow-discrete;
+      }
+      details.inline-drawer:not([open])::details-content,
+      .raw-accordion details:not([open])::details-content {
+        block-size: 0;
+      }
+    }
+
+    .drawer-content {
+      padding: 12px 14px;
+      background: #FFFFFF;
+      font-size: 14.5px;
+      color: var(--ink-1);
+    }
+
+    .drawer-content h4 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-3);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .drawer-content p { margin: 0 0 10px; }
+    .drawer-content ul { margin: 0 0 10px; padding-left: 18px; }
+    .drawer-content li + li { margin-top: 5px; }
+
+    .boundary-note {
+      background: var(--bg-sand);
+      border-left: 2.5px solid var(--border-strong);
+      padding: 8px 12px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .evidence-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 680px) {
+      .evidence-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .ev-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      background: var(--bg-paper);
+      font-size: 13.5px;
+      min-width: 0;
+    }
+
+    .ev-box pre {
+      margin: 6px 0 0;
+      font-family: var(--font-mono);
+      font-size: 12.2px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      color: var(--ink-2);
+    }
+
+    .ev-thumb-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 4px 8px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: #FFFFFF;
+      color: var(--ink-1);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .ev-thumb-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent-deep);
+    }
+
+    .ev-thumb-btn img {
+      width: 28px;
+      height: 32px;
+      object-fit: cover;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+    }
+
+    .empty-search {
+      display: none;
+      padding: 20px;
+      text-align: center;
+      color: var(--ink-3);
+      background: #FFFFFF;
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius-lg);
+      font-size: 14px;
+    }
+
+    .table-scroll {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-top: 14px;
+    }
+
+    table.ed-table {
+      width: 100%;
+      min-width: 640px;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      line-height: 1.55;
+      background: #FFFFFF;
+    }
+
+    .ed-table th {
+      background: var(--bg-table-head);
+      color: var(--ink-1);
+      font-weight: 700;
+      text-align: left;
+      padding: 9px 11px;
+      border-bottom: 1px solid var(--border-strong);
+      white-space: nowrap;
+    }
+
+    .ed-table td {
+      padding: 9px 11px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--ink-2);
+    }
+
+    .ed-table td:first-child { font-weight: 700; color: var(--accent-deep); }
+    .ed-table tr:last-child td { border-bottom: none; }
+
+    .resume-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .resume-card p { margin: 0; font-size: 14.5px; }
+    .resume-card ul, .resume-card ol { margin: 0; padding-left: 18px; font-size: 14.5px; }
+    .resume-card li + li { margin-top: 5px; }
+
+    .proposal-callout {
+      background: var(--accent-tint);
+      border: 1.2px dashed var(--accent);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+    }
+
+    .proposal-callout h3 {
+      margin: 0 0 6px;
+      font-size: 15px;
+      color: var(--accent-deep);
+    }
+
+    .raw-accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .raw-accordion details {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .raw-accordion summary {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 10px;
+      padding: 13px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--ink-1);
+      cursor: pointer;
+      user-select: none;
+      background: var(--bg-paper);
+    }
+
+    .raw-accordion details[open] > summary { border-bottom: 1px solid var(--border); }
+    .raw-accordion summary::-webkit-details-marker { display: none; }
+
+    .raw-accordion summary::before {
+      content: "";
+      inline-size: 0.95em;
+      block-size: 0.95em;
+      flex-shrink: 0;
+      background-color: var(--accent-deep);
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='black'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E") no-repeat center / contain;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='black'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E") no-repeat center / contain;
+      rotate: -90deg;
+    }
+
+    .raw-accordion details[open] > summary::before { rotate: 0deg; }
+
+    .summary-meta {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--ink-3);
+    }
+
+    .details-body { padding: 16px; }
+
+    .source-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 720px) {
+      .source-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .source-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      background: var(--bg-paper);
+      min-width: 0;
+    }
+
+    .source-box h3 { margin: 0 0 8px; font-size: 14.5px; }
+
+    .img-zoom-btn {
+      display: block;
+      width: 100%;
+      padding: 0;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: #FFFFFF;
+      cursor: zoom-in;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .img-zoom-btn img {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1280 / 1463;
+    }
+
+    .transcript-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      line-height: 1.58;
+      color: var(--ink-2);
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+      margin: 0;
+    }
+
+    .chat-round {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+      background: var(--bg-paper);
+    }
+
+    .chat-round > summary {
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .round-body {
+      padding: 12px;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .turn {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      background: var(--bg-paper);
+    }
+
+    .turn.is-user {
+      border-left: 3px solid var(--accent);
+      background: #FFFFFF;
+    }
+
+    .turn-head {
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--ink-2);
+    }
+
+    .turn pre {
+      margin: 0;
+      font-family: var(--font-sans);
+      font-size: 13.8px;
+      line-height: 1.62;
+      white-space: pre-wrap;
+      color: var(--ink-1);
+    }
+
+    dialog.lightbox {
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 0;
+      max-width: min(94vw, 840px);
+      max-height: 92dvh;
+      background: #FFFFFF;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+    }
+
+    dialog.lightbox::backdrop { background: rgba(20, 20, 19, 0.62); }
+
+    .lightbox-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-sand);
+    }
+
+    .lightbox-body {
+      padding: 12px;
+      overflow: auto;
+      max-height: calc(92dvh - 52px);
+    }
+
+    .lightbox-body img { display: block; width: 100%; height: auto; }
+
+    .page-footer {
+      margin-top: 38px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 6px 14px;
+      font-size: 12.5px;
+      color: var(--ink-3);
+    }
+
+    .page-footer a { color: var(--accent-deep); }
+  </style>
+</head>
+<body>
+  <div class="top-rule" aria-hidden="true"></div>
+
+  <div class="workbench-bar">
+    <div class="workbench-inner">
+      <div class="bar-row">
+        <search class="filter-search" aria-label="Search judgments and sources">
+          <div class="search-input-wrap">
+            <input type="search" id="wb-search" class="search-input" placeholder="Filter judgments, keywords, or quotes (e.g., permissionless, bun shop, 10 pieces)" aria-label="Keyword filter">
+            <button type="button" id="wb-search-clear" class="search-clear" aria-label="Clear search">✕</button>
+          </div>
+          <span class="filter-count" id="wb-filter-count">5 / 5</span>
+        </search>
+
+        <div class="mode-switch" role="group" aria-label="Reading mode toggle">
+          <button type="button" class="mode-btn" id="mode-brief" aria-pressed="true">Brief Mode</button>
+          <button type="button" class="mode-btn" id="mode-full" aria-pressed="false">Expand All</button>
+        </div>
+      </div>
+
+      <nav class="anchor-nav" aria-label="Quick navigation">
+        <a href="#overview">Trajectory</a>
+        <a href="#mindmap">Mind Map</a>
+        <a href="#pitch">30s Pitch</a>
+        <a href="#judgments">Judgments J01–J05</a>
+        <a href="#resume">Next Steps</a>
+        <a href="#raw-archive">Raw Archive</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="container">
+    <header class="article-header">
+      <div class="eyebrow">PERSONAL COGNITION ARCHIVE · NAVAL RAVIKANT</div>
+      <h1>Naval's Leverage: From Clarifying the Concept to Starting Content Creation</h1>
+      <div class="meta-line">
+        <span>Source: Naval Ravikant on how to build leverage (pp. 1–2) + 5-Round Discussion</span>
+        <span class="meta-links">
+          Draft <a href="./index.md">index.md</a> · Review <a href="./Naval's Leverage - Key Takeaways.pdf">Key Takeaways.pdf</a> · Source <a href="./Naval's Leverage - Original Text.pdf">Original Text.pdf</a>
+        </span>
+      </div>
+    </header>
+
+    <main>
+      <section id="overview" class="sec" aria-labelledby="overview-h">
+        <div class="sec-head">
+          <span class="sec-num">01</span>
+          <h2 id="overview-h">Core Question &amp; Inquiry Path</h2>
+        </div>
+
+        <div class="lead-box">
+          <p><span class="role-tag is-user">Me</span> <strong>Starting Question:</strong> Are these two pages of notes about stock trading or life principles? What do "permissionless leverage" and the "magic combination of all three kinds" mean, and how should I start creating media content from scratch? (C01–C05)</p>
+          <p><span class="role-tag">Author</span> <span class="role-tag">AI</span> <strong>Core Takeaway:</strong> To escape linear time-for-money income, take accountability first, build judgment and untrainable specific knowledge, and attach permissionless leverage with zero marginal replication cost (code or media) early; for a beginner, documenting what you already tinker with online is the lowest-friction starting path.</p>
+        </div>
+
+        <div class="trace-strip" aria-label="Five-round thinking trajectory">
+          <div class="trace-item">
+            <div class="trace-top"><span>STEP 01</span><span>C01</span></div>
+            <div class="trace-q">Shared two note images; asked for an overview.</div>
+            <div class="trace-a">AI framed pillars, lever types, and accountability-to-judgment path.</div>
+            <a class="trace-jump" href="#j04" data-jump-card="j04">View J04 →</a>
+          </div>
+          <div class="trace-item">
+            <div class="trace-top"><span>STEP 02</span><span>C02</span></div>
+            <div class="trace-q">Never traded stocks—is this finance or life?</div>
+            <div class="trace-a">Clarified life multiplier vs. margin debt using crowbar &amp; milk-tea analogies.</div>
+            <a class="trace-jump" href="#j01" data-jump-card="j01">View J01 →</a>
+          </div>
+          <div class="trace-item">
+            <div class="trace-top"><span>STEP 03</span><span>C03</span></div>
+            <div class="trace-q">Walk through from start to finish with examples.</div>
+            <div class="trace-a">Added certificate vs. taste and bicycle vs. cargo-ship contrasts.</div>
+            <a class="trace-jump" href="#j04" data-jump-card="j04">View J04 →</a>
+          </div>
+          <div class="trace-item">
+            <div class="trace-top"><span>STEP 04</span><span>C04</span></div>
+            <div class="trace-q">Misheard "interest-free"; why stack all 3 levers?</div>
+            <div class="trace-a">Corrected to "permissionless"; contrasted bun shop vs. 15-person app startup.</div>
+            <a class="trace-jump" href="#j02" data-jump-card="j02">View J02/J03 →</a>
+          </div>
+          <div class="trace-item is-stop">
+            <div class="trace-top"><span>STEP 05 · STOP</span><span>C05</span></div>
+            <div class="trace-q">Picked media content: how to start &amp; advice?</div>
+            <div class="trace-a">Suggested life-byproduct notes; proposed "publish 10 pieces first" (pending).</div>
+            <a class="trace-jump" href="#j05" data-jump-card="j05">View J05 →</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="mindmap" class="sec" aria-labelledby="mindmap-h">
+        <div class="sec-head">
+          <span class="sec-num">02</span>
+          <h2 id="mindmap-h">Mind Map: Structural Tree of the Argument</h2>
+        </div>
+        <p class="sec-sub">Three main branches radiate from the central question. Click any node to jump directly to and expand its judgment card.</p>
+
+        <div class="graph-wrap">
+          <svg class="tree-desktop" viewBox="0 0 820 426" role="img" aria-label="Naval's Leverage Tree Mind Map (Desktop)">
+            <g fill="none" stroke="#C8C1B4" stroke-width="1.6">
+              <path d="M 164 213 C 198 213, 198 74, 232 74" stroke="#B44E2D" stroke-width="1.8" />
+              <path d="M 164 213 C 198 213, 198 213, 232 213" stroke="#B44E2D" stroke-width="1.8" />
+              <path d="M 164 213 C 198 213, 198 352, 232 352" stroke="#B44E2D" stroke-width="1.8" />
+
+              <path d="M 424 74 C 454 74, 454 40, 484 40" />
+              <path d="M 424 74 C 454 74, 454 106, 484 106" />
+
+              <path d="M 424 213 C 454 213, 454 176, 484 176" />
+              <path d="M 424 213 C 454 213, 454 242, 484 242" />
+
+              <path d="M 424 352 C 454 352, 454 318, 484 318" />
+              <path d="M 424 352 C 454 352, 454 384, 484 384" stroke="#B44E2D" stroke-dasharray="4 3" />
+            </g>
+
+            <g class="tree-node" data-jump-card="j01" tabindex="0" role="link" aria-label="Central thesis: Escape linear time-selling, jump to J01">
+              <rect x="12" y="173" width="152" height="80" rx="8" fill="#FBF4F0" stroke="#8B3A1E" stroke-width="1.8" />
+              <text x="88" y="199" text-anchor="middle" font-size="13" font-weight="700" fill="#141413">Escape Selling Hours</text>
+              <text x="88" y="219" text-anchor="middle" font-size="11.2" fill="#8B3A1E">Multiply Effort at Scale</text>
+              <text x="88" y="238" text-anchor="middle" font-size="10.8" fill="#78756E">J01 · Not Margin Debt</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j02" tabindex="0" role="link" aria-label="Branch 1: Why you can start alone, jump to J02">
+              <rect x="232" y="46" width="192" height="56" rx="7" fill="#F3F1EC" stroke="#CEC8BC" stroke-width="1.4" />
+              <text x="244" y="70" font-size="12.5" font-weight="700" fill="#141413">1. Why You Can Start Alone</text>
+              <text x="244" y="89" font-size="11" fill="#4A4843">No Approval · Real Moat</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j03" tabindex="0" role="link" aria-label="Branch 2: How one effort scales, jump to J03">
+              <rect x="232" y="185" width="192" height="56" rx="7" fill="#F3F1EC" stroke="#CEC8BC" stroke-width="1.4" />
+              <text x="244" y="209" font-size="12.5" font-weight="700" fill="#141413">2. How Effort Multiplies</text>
+              <text x="244" y="228" font-size="11" fill="#4A4843">Zero Marginal Cost + Combo</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j05" tabindex="0" role="link" aria-label="Branch 3: First step from zero, jump to J05">
+              <rect x="232" y="324" width="192" height="56" rx="7" fill="#F3F1EC" stroke="#CEC8BC" stroke-width="1.4" />
+              <text x="244" y="348" font-size="12.5" font-weight="700" fill="#141413">3. First Step from Zero</text>
+              <text x="244" y="367" font-size="11" fill="#4A4843">Accountability · Media Launch</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j02" tabindex="0" role="link">
+              <rect x="484" y="14" width="322" height="52" rx="6" fill="#FFFFFF" stroke="#E4E0D8" stroke-width="1.3" />
+              <text x="498" y="36" font-size="12.5" font-weight="700" fill="#141413">J02 · Permissionless Leverage (Code &amp; Media)</text>
+              <text x="498" y="53" font-size="11" fill="#4A4843">No boss or investor sign-off needed to start today</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j04" tabindex="0" role="link">
+              <rect x="484" y="80" width="322" height="52" rx="6" fill="#FFFFFF" stroke="#E4E0D8" stroke-width="1.3" />
+              <text x="498" y="102" font-size="12.5" font-weight="700" fill="#141413">J04 · Specific Knowledge &amp; Judgment</text>
+              <text x="498" y="119" font-size="11" fill="#4A4843">Follow curiosity; slow down to steer high leverage</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j02" tabindex="0" role="link">
+              <rect x="484" y="150" width="322" height="52" rx="6" fill="#FFFFFF" stroke="#E4E0D8" stroke-width="1.3" />
+              <text x="498" y="172" font-size="12.5" font-weight="700" fill="#141413">J02 · Zero Marginal Cost of Replication</text>
+              <text x="498" y="189" font-size="11" fill="#4A4843">Build/record once; serve 1M with near-zero extra cost</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j03" tabindex="0" role="link">
+              <rect x="484" y="216" width="322" height="52" rx="6" fill="#FFFFFF" stroke="#E4E0D8" stroke-width="1.3" />
+              <text x="498" y="238" font-size="12.5" font-weight="700" fill="#141413">J03 · The Startup "Magic Combination"</text>
+              <text x="498" y="255" font-size="11" fill="#4A4843">Lean elite labor + scaling capital + code &amp; media</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j05" tabindex="0" role="link">
+              <rect x="484" y="292" width="322" height="52" rx="6" fill="#FFFFFF" stroke="#E4E0D8" stroke-width="1.3" />
+              <text x="498" y="314" font-size="12.5" font-weight="700" fill="#141413">J05 · Take Accountability, Share Field Notes</text>
+              <text x="498" y="331" font-size="11" fill="#4A4843">Peer trial-and-error + low views as free tuition</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="resume" tabindex="0" role="link">
+              <rect x="484" y="358" width="322" height="52" rx="6" fill="#FBF4F0" stroke="#B44E2D" stroke-width="1.4" stroke-dasharray="5 3" />
+              <text x="498" y="380" font-size="12.5" font-weight="700" fill="#8B3A1E">Pending · Commit to "Publish 10 Pieces First"</text>
+              <text x="498" y="397" font-size="11" fill="#4A4843">1–2 posts/week to complete the loop (awaiting decision)</text>
+            </g>
+          </svg>
+
+          <svg class="tree-mobile" viewBox="0 0 340 578" role="img" aria-label="Naval's Leverage Tree Mind Map (Mobile)">
+            <line x1="22" y1="68" x2="22" y2="528" stroke="#CEC8BC" stroke-width="1.8" />
+            <line x1="22" y1="112" x2="38" y2="112" stroke="#B44E2D" stroke-width="1.8" />
+            <line x1="22" y1="268" x2="38" y2="268" stroke="#B44E2D" stroke-width="1.8" />
+            <line x1="22" y1="424" x2="38" y2="424" stroke="#B44E2D" stroke-width="1.8" />
+
+            <line x1="54" y1="138" x2="54" y2="228" stroke="#E4E0D8" stroke-width="1.6" />
+            <line x1="54" y1="168" x2="68" y2="168" stroke="#E4E0D8" stroke-width="1.6" />
+            <line x1="54" y1="224" x2="68" y2="224" stroke="#E4E0D8" stroke-width="1.6" />
+
+            <line x1="54" y1="294" x2="54" y2="384" stroke="#E4E0D8" stroke-width="1.6" />
+            <line x1="54" y1="324" x2="68" y2="324" stroke="#E4E0D8" stroke-width="1.6" />
+            <line x1="54" y1="380" x2="68" y2="380" stroke="#E4E0D8" stroke-width="1.6" />
+
+            <line x1="54" y1="450" x2="54" y2="540" stroke="#E4E0D8" stroke-width="1.6" />
+            <line x1="54" y1="480" x2="68" y2="480" stroke="#E4E0D8" stroke-width="1.6" />
+            <line x1="54" y1="536" x2="68" y2="536" stroke="#B44E2D" stroke-width="1.6" stroke-dasharray="3 2" />
+
+            <g class="tree-node" data-jump-card="j01" tabindex="0" role="link">
+              <rect x="10" y="10" width="320" height="58" rx="8" fill="#FBF4F0" stroke="#8B3A1E" stroke-width="1.6" />
+              <text x="24" y="34" font-size="13.5" font-weight="700" fill="#141413">Escape Selling Hours (J01 · Not Stocks)</text>
+              <text x="24" y="53" font-size="12" fill="#8B3A1E">Multiply single effort via leverage</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j02" tabindex="0" role="link">
+              <rect x="38" y="86" width="292" height="48" rx="6" fill="#F3F1EC" stroke="#CEC8BC" stroke-width="1.2" />
+              <text x="50" y="107" font-size="13" font-weight="700" fill="#141413">1. Why You Can Start Alone</text>
+              <text x="50" y="124" font-size="11.5" fill="#4A4843">No approval + untrainable moat</text>
+            </g>
+            <g class="tree-node" data-jump-card="j02" tabindex="0" role="link">
+              <rect x="68" y="144" width="262" height="46" rx="6" fill="#FFFFFF" stroke="#E4E0D8" />
+              <text x="80" y="164" font-size="12.5" font-weight="700" fill="#141413">J02 · Permissionless Leverage</text>
+              <text x="80" y="180" font-size="11.5" fill="#4A4843">Start tonight with code or media</text>
+            </g>
+            <g class="tree-node" data-jump-card="j04" tabindex="0" role="link">
+              <rect x="68" y="198" width="262" height="46" rx="6" fill="#FFFFFF" stroke="#E4E0D8" />
+              <text x="80" y="218" font-size="12.5" font-weight="700" fill="#141413">J04 · Specific Knowledge &amp; Judgment</text>
+              <text x="80" y="234" font-size="11.5" fill="#4A4843">Curiosity first; slow down later</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j03" tabindex="0" role="link">
+              <rect x="38" y="252" width="292" height="42" rx="6" fill="#F3F1EC" stroke="#CEC8BC" stroke-width="1.2" />
+              <text x="50" y="277" font-size="13" font-weight="700" fill="#141413">2. How Effort Multiplies &amp; Stacks</text>
+            </g>
+            <g class="tree-node" data-jump-card="j02" tabindex="0" role="link">
+              <rect x="68" y="302" width="262" height="46" rx="6" fill="#FFFFFF" stroke="#E4E0D8" />
+              <text x="80" y="322" font-size="12.5" font-weight="700" fill="#141413">J02 · Zero Marginal Replication Cost</text>
+              <text x="80" y="338" font-size="11.5" fill="#4A4843">1 user or 1M users at near-zero cost</text>
+            </g>
+            <g class="tree-node" data-jump-card="j03" tabindex="0" role="link">
+              <rect x="68" y="356" width="262" height="46" rx="6" fill="#FFFFFF" stroke="#E4E0D8" />
+              <text x="80" y="376" font-size="12.5" font-weight="700" fill="#141413">J03 · Magic Combination</text>
+              <text x="80" y="392" font-size="11.5" fill="#4A4843">Lean labor + capital + code/media</text>
+            </g>
+
+            <g class="tree-node" data-jump-card="j05" tabindex="0" role="link">
+              <rect x="38" y="410" width="292" height="42" rx="6" fill="#F3F1EC" stroke="#CEC8BC" stroke-width="1.2" />
+              <text x="50" y="435" font-size="13" font-weight="700" fill="#141413">3. First Step from Zero</text>
+            </g>
+            <g class="tree-node" data-jump-card="j05" tabindex="0" role="link">
+              <rect x="68" y="460" width="262" height="46" rx="6" fill="#FFFFFF" stroke="#E4E0D8" />
+              <text x="80" y="480" font-size="12.5" font-weight="700" fill="#141413">J05 · Accountability + Media Start</text>
+              <text x="80" y="496" font-size="11.5" fill="#4A4843">Share real field notes publicly</text>
+            </g>
+            <g class="tree-node" data-jump-card="resume" tabindex="0" role="link">
+              <rect x="68" y="514" width="262" height="50" rx="6" fill="#FBF4F0" stroke="#B44E2D" stroke-dasharray="4 3" />
+              <text x="80" y="535" font-size="12.5" font-weight="700" fill="#8B3A1E">Pending · Publish 10 Pieces First</text>
+              <text x="80" y="552" font-size="11.5" fill="#4A4843">1–2 posts/week to close the loop</text>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <section id="pitch" class="sec" aria-labelledby="pitch-h">
+        <div class="sec-head">
+          <span class="sec-num">03</span>
+          <h2 id="pitch-h">Speak It Clearly: 30-Second Verbal Summary</h2>
+        </div>
+
+        <article class="pitch-card">
+          <div class="pitch-head">
+            <h3>Use these three beats whenever explaining these notes:</h3>
+            <div>
+              <button type="button" class="btn-ghost" id="copy-pitch-btn">Copy 30s Pitch</button>
+              <span class="copy-feedback" id="pitch-status" role="status" aria-live="polite"></span>
+            </div>
+          </div>
+
+          <p class="pitch-lead">
+            One-liner: Naval's "leverage" isn't borrowing money to trade stocks—it's using code or media so an ordinary person can multiply one unit of effort without anyone's permission.
+          </p>
+          <ol class="pitch-list">
+            <li><strong>Why does money flow to you?</strong> Through untrainable "specific knowledge" grown from genuine curiosity—anything taught in a standard bootcamp makes you replaceable.</li>
+            <li><strong>How do you scale effort?</strong> Start with permissionless, zero-marginal-cost code and media; once a small team proves direction, stack lean elite talent and capital to scale.</li>
+            <li><strong>What's step one with no resources?</strong> Take public accountability now to build judgment through real feedback—for media, document what you already tinker with and publish 10 pieces first.</li>
+          </ol>
+          <div class="pitch-example">
+            <strong>Everyday Contrast:</strong> A steamed-bun shop must knead fresh dough for every extra bun sold; a small app or a healthy-recipe video serves 1 person or 1,000,000 without cooking another plate—that's zero marginal cost of replication.
+          </div>
+        </article>
+      </section>
+
+      <section id="judgments" class="sec" aria-labelledby="judgments-h">
+        <div class="sec-head">
+          <span class="sec-num">04</span>
+          <h2 id="judgments-h">Core Judgments: Scan Conclusions, Expand Reasoning &amp; Evidence Inline</h2>
+        </div>
+        <p class="sec-sub">Each card shows its core conclusion by default; open the drawers below to inspect full reasoning or compare verbatim sources and chat turns in place.</p>
+
+        <div class="empty-search" id="empty-search">No judgments match that filter. Try "permissionless", "bun shop", "judgment", or clear the search box.</div>
+
+        <div class="judgment-stack" id="judgment-stack">
+          <article id="j01" class="j-card" data-keywords="J01 leverage finance stocks crowbar hourly milk tea interest-free multiplier">
+            <div class="j-top">
+              <div class="j-title-group">
+                <span class="j-id">J01</span>
+                <h3>"Leverage" Here Is a Work-Output Multiplier, Not Financial Margin Borrowing</h3>
+              </div>
+              <span class="j-cites">S01 · C02 · C04</span>
+            </div>
+            <div class="j-conclusion">
+              <span class="role-tag">AI</span> In Naval's notes, "leverage" refers to tools and mechanisms that multiply single personal effort—a personal growth and value-creation method, not borrowing money to trade stocks.
+            </div>
+
+            <div class="drawer-pair">
+              <details class="inline-drawer arg-drawer">
+                <summary>Expand Reasoning: Why It Holds · Boundaries · Key Example</summary>
+                <div class="drawer-content">
+                  <h4>Why It Holds</h4>
+                  <ul>
+                    <li><span class="role-tag">Author</span> The thesis is "Get paid at scale," listing labor, capital, code, and media as the tools.</li>
+                    <li><span class="role-tag">AI</span> Selling pure hours hits a 24-hour ceiling; like a physical crowbar, leverage breaks the 1:1 link between hours and output without broker margin calls. Mishearing "permissionless" as "interest-free" in Round 4 came from that same financial association.</li>
+                  </ul>
+                  <div class="boundary-note">
+                    <strong>Boundaries / Counterexamples:</strong> <span class="role-tag">AI</span> While no stock background is needed, "capital leverage" does involve raising funds; real-world debt or margin trading still carries principal loss and default risk and cannot hide behind "life leverage."
+                  </div>
+                  <h4>Key Example (Hypothetical Contrast)</h4>
+                  <p><span class="role-tag">AI</span> Hourly gigs are life without leverage—earning twice as much means working twice as late. Shaking milk tea alone caps at ~50 cups/day, whereas hiring 10 staff (labor) or recording a viral tutorial watched by tens of thousands (media) multiplies output in the same hours.</p>
+                </div>
+              </details>
+
+              <details class="inline-drawer src-drawer">
+                <summary>Compare Source &amp; Chat Inline (S01 · C02)</summary>
+                <div class="drawer-content">
+                  <div class="evidence-grid">
+                    <div class="ev-box">
+                      <strong><span class="role-tag">Author</span> S01 · Get paid at scale</strong>
+                      <pre>• If you want to make money you have to get paid at scale.
+• And why you, that's accountability, at scale, that's leverage, and just you getting paid as opposed to somebody else getting paid, that's specific knowledge.</pre>
+                      <button type="button" class="ev-thumb-btn" data-zoom-src="../raw/source_01.jpg" data-zoom-title="S01 · English Notes Page 1">
+                        <img src="../raw/source_01.jpg" alt="S01 thumbnail" width="1280" height="1463" loading="eager">
+                        <span>View Page 1 Image</span>
+                      </button>
+                    </div>
+                    <div class="ev-box">
+                      <strong><span class="role-tag is-user">Me</span> → <span class="role-tag">AI</span> C02 Excerpt</strong>
+                      <pre>Me: What is leverage? I've never traded stocks—are these notes about life principles or finance?
+
+AI: These two pages are about life principles and personal growth, not stock trading. Originally leverage means a physical crowbar multiplying small effort...</pre>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </article>
+
+          <article id="j02" class="j-card" data-keywords="J02 permissionless interest-free zero marginal cost replication code media bun shop app robot army">
+            <div class="j-top">
+              <div class="j-title-group">
+                <span class="j-id">J02</span>
+                <h3>Beginners Should Prioritize "Permissionless" Leverage with Zero Marginal Cost of Replication</h3>
+              </div>
+              <span class="j-cites">S01 · S02 · C03 · C04</span>
+            </div>
+            <div class="j-conclusion">
+              <span class="role-tag">Author</span> Traditional labor and capital require someone else's approval first, whereas code and media are permissionless and cost almost nothing to replicate—making them the top levers for ordinary people.
+            </div>
+
+            <div class="drawer-pair">
+              <details class="inline-drawer arg-drawer">
+                <summary>Expand Reasoning: Why It Holds · Boundaries · Key Example</summary>
+                <div class="drawer-content">
+                  <h4>Why It Holds</h4>
+                  <ul>
+                    <li><span class="role-tag">Author</span> Labor requires followers; capital requires investors. Historically, people without fame or money rarely passed that permission gate.</li>
+                    <li><span class="role-tag">Author</span> Code, books, podcasts, tweets, and videos combine two superpowers: <strong>permissionless</strong> entry (no boss or investor needed) and <strong>zero marginal cost of replication</strong> (once created, serving 1M users takes no extra raw materials). Writing code creates a nighttime "army of robots."</li>
+                  </ul>
+                  <div class="boundary-note">
+                    <strong>Boundaries / Counterexamples:</strong> <span class="role-tag">AI</span> Zero marginal cost does not mean zero upfront cost: building great software or videos still takes heavy upfront work. Also, while starting content is permissionless, platform reach still depends on algorithms, rules, and audience demand.
+                  </div>
+                  <h4>Key Example (Hypothetical Contrast)</h4>
+                  <p><span class="role-tag">AI</span> A steamed-bun shop must knead fresh dough and filling for every extra bun sold. Spending one week coding a vocabulary app or filming a fat-loss recipe video works once; whether 1 person or 1,000,000 use it, you never cook another dish or rewrite the code.</p>
+                </div>
+              </details>
+
+              <details class="inline-drawer src-drawer">
+                <summary>Compare Source &amp; Chat Inline (S01 · S02 · C04)</summary>
+                <div class="drawer-content">
+                  <div class="evidence-grid">
+                    <div class="ev-box">
+                      <strong><span class="role-tag">Author</span> S01 · Use permissionless leverage</strong>
+                      <pre>• The most interesting and the most important form of leverage is this idea of products that have no marginal cost of replication.
+• They don't require somebody else's permission for you to use them or succeed.</pre>
+                      <button type="button" class="ev-thumb-btn" data-zoom-src="../raw/source_01.jpg" data-zoom-title="S01 · English Notes Page 1">
+                        <img src="../raw/source_01.jpg" alt="S01 thumbnail" width="1280" height="1463" loading="eager">
+                        <span>View Page 1 Image</span>
+                      </button>
+                    </div>
+                    <div class="ev-box">
+                      <strong><span class="role-tag is-user">Me</span> → <span class="role-tag">AI</span> C04 Excerpt</strong>
+                      <pre>Me: You didn't explain that "interest-free permission" leverage clearly enough...
+
+AI: It's not "interest-free"—it's "permissionless," meaning no one's approval is required, and each extra copy sold costs virtually nothing extra.</pre>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </article>
+
+          <article id="j03" class="j-card" data-keywords="J03 magic combination three levers labor capital coffee chain 15-person app Instagram startup">
+            <div class="j-top">
+              <div class="j-title-group">
+                <span class="j-id">J03</span>
+                <h3>Single Levers Hit Ceilings; Tech Startups Explode via the "Magic Combination"</h3>
+              </div>
+              <span class="j-cites">S02 · C03 · C04</span>
+            </div>
+            <div class="j-conclusion">
+              <span class="role-tag">Author</span> Relying on one lever alone struggles to balance lean expansion with massive reach; stacking minimum elite labor, abundant code/media, and scaling capital creates multiplicative startup returns.
+            </div>
+
+            <div class="drawer-pair">
+              <details class="inline-drawer arg-drawer">
+                <summary>Expand Reasoning: Why It Holds · Boundaries · Key Example</summary>
+                <div class="drawer-content">
+                  <h4>Why It Holds</h4>
+                  <ul>
+                    <li><span class="role-tag">AI</span> Alone, each lever stalls: labor bloats management and payroll; capital without product/reach burns cash; solo code/media hits one person's bandwidth limit.</li>
+                    <li><span class="role-tag">Author</span> Startups hire minimum highest-output talent (engineers, designers, product builders), ship replicable code and media content globally, and pour raised capital into marketing, ads, and scaling.</li>
+                  </ul>
+                  <div class="boundary-note">
+                    <strong>Boundaries / Counterexamples:</strong> <span class="role-tag">AI</span> The magic combination fits validated teams scaling 1→10,000. A solo beginner in 0→1 exploration who raises capital and hires prematurely gets crushed by overhead.
+                  </div>
+                  <h4>Key Example</h4>
+                  <p><span class="role-tag">AI</span> (Hypothetical contrast) Serving 10M users as a coffee chain requires thousands of stores and tens of thousands of staff over 5–10 years; a 15-person productivity-app team puts code onto 10M phones, builds early fans via podcasts, and uses raised capital for ads/servers to explode in six months. (Round 3 also cited early Instagram serving tens of millions with ~a dozen people; exact figures unverified in source.)</p>
+                </div>
+              </details>
+
+              <details class="inline-drawer src-drawer">
+                <summary>Compare Source &amp; Chat Inline (S02 · C04)</summary>
+                <div class="drawer-content">
+                  <div class="evidence-grid">
+                    <div class="ev-box">
+                      <strong><span class="role-tag">Author</span> S02 · Combine all three kinds</strong>
+                      <pre>• ...where you take just the minimum, but highest output labor that you can get... Then you add in capital. You use that for marketing, advertising, scaling. You add in lots of code and media...</pre>
+                      <button type="button" class="ev-thumb-btn" data-zoom-src="../raw/source_02.jpg" data-zoom-title="S02 · English Notes Page 2">
+                        <img src="../raw/source_02.jpg" alt="S02 thumbnail" width="1280" height="1463" loading="eager">
+                        <span>View Page 2 Image</span>
+                      </button>
+                    </div>
+                    <div class="ev-box">
+                      <strong><span class="role-tag is-user">Me</span> → <span class="role-tag">AI</span> C04 Excerpt</strong>
+                      <pre>Me: Please expand in detail on the magic combination of the three levers.
+
+AI: Any single lever hits a ceiling... Permissionless leverage solves 0-to-1 for an individual; the magic combination solves 1-to-10,000 for a small team.</pre>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </article>
+
+          <article id="j04" class="j-card" data-keywords="J04 specific knowledge judgment curiosity training slow down bicycle cargo ship taste">
+            <div class="j-top">
+              <div class="j-title-group">
+                <span class="j-id">J04</span>
+                <h3>Untrainable "Specific Knowledge" and Late-Stage "Judgment" Decide the Upside</h3>
+              </div>
+              <span class="j-cites">S01 · S02 · C01 · C03</span>
+            </div>
+            <div class="j-conclusion">
+              <span class="role-tag">Author</span> Scale requires specific knowledge so rewards flow to you instead of others; in an age of infinite leverage, hustle early to acquire leverage, then slow down because judgment becomes decisive.
+            </div>
+
+            <div class="drawer-pair">
+              <details class="inline-drawer arg-drawer">
+                <summary>Expand Reasoning: Why It Holds · Boundaries · Key Example</summary>
+                <div class="drawer-content">
+                  <h4>Why It Holds</h4>
+                  <ul>
+                    <li><span class="role-tag">Author</span> <strong>Cannot be taught, can be learned:</strong> Any skill learned in a standardized class lets others train and replace you. Real specific knowledge grows from innate talent and curiosity at the edge of knowledge—anyone not 100% into it loses to someone who is.</li>
+                    <li><span class="role-tag">Author</span> <strong>Higher leverage makes judgment costlier:</strong> Everything prepares you to apply judgment; demonstrated judgment and credibility are vital because one wrong turn scales losses just as fast as wins.</li>
+                  </ul>
+                  <div class="boundary-note">
+                    <strong>Boundaries / Counterexamples:</strong> <span class="role-tag">AI</span> Foundational skills (languages, basic editing, coding syntax) remain valuable entry floors—they just aren't durable moats. Also, "slowing down" presumes you already hold leverage; overthinking before acting with zero leverage stalls progress.
+                  </div>
+                  <h4>Key Example (Contrast &amp; Analogy)</h4>
+                  <p><span class="role-tag">AI</span> A two-week office-software certificate isn't specific knowledge, whereas product taste or turning dry tech into plain speech is self-honed. Without leverage you ride a bicycle—a wrong turn scrapes a knee; holding millions of followers or high-traffic software is steering a loaded cargo ship where direction outweighs all-nighters.</p>
+                </div>
+              </details>
+
+              <details class="inline-drawer src-drawer">
+                <summary>Compare Source &amp; Chat Inline (S01 · S02 · C03)</summary>
+                <div class="drawer-content">
+                  <div class="evidence-grid">
+                    <div class="ev-box">
+                      <strong><span class="role-tag">Author</span> S01 &amp; S02 Core Lines</strong>
+                      <pre>• If you can be trained for it... then somebody else can be trained for it too.
+• The first part of your career's spent hustling to get leverage. Once you have the leverage, then you wanna slow down a bit, because your judgment really matters.</pre>
+                      <button type="button" class="ev-thumb-btn" data-zoom-src="../raw/source_02.jpg" data-zoom-title="S02 · English Notes Page 2">
+                        <img src="../raw/source_02.jpg" alt="S02 thumbnail" width="1280" height="1463" loading="eager">
+                        <span>View Page 2 Image</span>
+                      </button>
+                    </div>
+                    <div class="ev-box">
+                      <strong><span class="role-tag">AI</span> C03 Analogy Excerpt</strong>
+                      <pre>Without leverage you're riding a bicycle—a wrong turn scrapes a knee; with a million followers or big software, you're steering a loaded cargo ship where picking the right direction matters more than working late.</pre>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </article>
+
+          <article id="j05" class="j-card" data-keywords="J05 accountability media start advice peer field notes byproduct 10 pieces daily weekly">
+            <div class="j-top">
+              <div class="j-title-group">
+                <span class="j-id">J05</span>
+                <h3>Take Accountability First, Earn Judgment in Public, and Launch via Low-Friction Media</h3>
+              </div>
+              <span class="j-cites">S02 · C03 · C05</span>
+            </div>
+            <div class="j-conclusion">
+              <span class="role-tag">Author</span> Specific knowledge and leverage take time, while "accountability" can start today; <span class="role-tag">AI</span> for starting media from zero, pick the lowest-friction medium to share what you already tinker with and calibrate judgment through real feedback.
+            </div>
+
+            <div class="drawer-pair">
+              <details class="inline-drawer arg-drawer">
+                <summary>Expand Reasoning: Why It Holds · Boundaries · Key Example</summary>
+                <div class="drawer-content">
+                  <h4>Why It Holds</h4>
+                  <ul>
+                    <li><span class="role-tag">Author</span> Take accountability first—put your neck on the chopping block publicly so you must deliver, earn judgment through experience, and let society reward you with leverage.</li>
+                    <li><span class="role-tag">AI</span> Publishing from one fixed account is low-risk accountability: skip fancy gear, write as a "peer two steps ahead," and treat low early views as free tuition calibrating your judgment.</li>
+                  </ul>
+                  <div class="boundary-note">
+                    <strong>Boundaries / Counterexamples:</strong> <span class="role-tag">AI</span> Accountability means staking personal reputation on manageable commitments—not reckless, irreversible liabilities. Avoid vowing "daily posts" on day one and quitting when motivation dips; 1–2 solid pieces a week compound reliably.
+                  </div>
+                  <h4>Key Example</h4>
+                  <p><span class="role-tag">Author</span> Saying "I'll take charge of this thing that nobody wants to take charge of." <span class="role-tag">AI</span> (Hypothetical contrast) Vague posts on "how to stay disciplined" get scrolled past; "Three tweaks that cut my phone scrolling in half" or "Four traps every beginner hits with tool X" carry real bookmark value.</p>
+                </div>
+              </details>
+
+              <details class="inline-drawer src-drawer">
+                <summary>Compare Source &amp; Chat Inline (S02 · C05)</summary>
+                <div class="drawer-content">
+                  <div class="evidence-grid">
+                    <div class="ev-box">
+                      <strong><span class="role-tag">Author</span> S02 · Take accountability first</strong>
+                      <pre>• Accountability is something you can take on immediately.
+• When you take on accountability, you're also publicly putting your neck on the chopping block, so you have to deliver.</pre>
+                      <button type="button" class="ev-thumb-btn" data-zoom-src="../raw/source_02.jpg" data-zoom-title="S02 · English Notes Page 2">
+                        <img src="../raw/source_02.jpg" alt="S02 thumbnail" width="1280" height="1463" loading="eager">
+                        <span>View Page 2 Image</span>
+                      </button>
+                    </div>
+                    <div class="ev-box">
+                      <strong><span class="role-tag is-user">Me</span> → <span class="role-tag">AI</span> C05 Excerpt</strong>
+                      <pre>Me: How should I get started with online media content, and what advice do you have?
+
+AI: Document what you already tinker with... Set a strict "publish 10 pieces first" rule; be a peer sharing field notes rather than lecturing; aim for 1–2 posts per week.</pre>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </article>
+        </div>
+
+        <div class="table-scroll" aria-label="Comparison of the three types of leverage">
+          <table class="ed-table">
+            <thead>
+              <tr>
+                <th>Leverage Type</th>
+                <th>Permission Needed?</th>
+                <th>Marginal Cost of Replication</th>
+                <th>Solo Ceiling</th>
+                <th>Role in Magic Combination</th>
+                <th>0→1 Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Code &amp; Media (New)</td>
+                <td>Permissionless: laptop &amp; account</td>
+                <td>Near zero: create once, scale infinitely</td>
+                <td>One person's R&amp;D/ops bandwidth</td>
+                <td>Core weapon &amp; global megaphone</td>
+                <td>Highest (best 0→1 start)</td>
+              </tr>
+              <tr>
+                <td>Labor (Traditional)</td>
+                <td>Permissioned: people must follow you</td>
+                <td>High: output tied linearly to payroll</td>
+                <td>Coordination friction grows with size</td>
+                <td>Lean elite special-ops team</td>
+                <td>Lower (validate solo first)</td>
+              </tr>
+              <tr>
+                <td>Capital (Traditional)</td>
+                <td>Permissioned: investors must trust you</td>
+                <td>Finite pool; relies on ROI conversion</td>
+                <td>Burns cash without product or reach</td>
+                <td>Jet fuel for ads &amp; scaling</td>
+                <td>Deferred (prove judgment first)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="resume" class="sec" aria-labelledby="resume-h">
+        <div class="sec-head">
+          <span class="sec-num">05</span>
+          <h2 id="resume-h">Continuation State &amp; Pending Proposal</h2>
+        </div>
+
+        <div class="resume-card">
+          <p><span class="role-tag is-user">Me</span> <strong>Last Specific Question:</strong> "How should I get started with online media content, and what advice do you have?" (C05·Me)</p>
+          <ul>
+            <li><strong>Confirmed Preferences &amp; Choices:</strong> Ruled out stock-trading margin debt and confirmed the life-multiplier framing (C02); narrowed action focus from code vs. media to starting with "media content" (C05).</li>
+            <li><strong>Still Open:</strong> Which 2–3 natural-curiosity topics to pick, whether to start with short text/image posts or smartphone video, and how to review early low-traffic posts.</li>
+          </ul>
+
+          <div class="proposal-callout">
+            <h3><span class="role-tag is-proposal">Pending</span> Core Launch Proposal: The "Publish 10 Pieces First" Rule</h3>
+            <p>Speak publicly from one fixed account, ignore view-count anxiety for the first 10 pieces, and complete the minimum loop: pick topic → structure thought → publish → read feedback. Paired with writing peer field notes, choosing the lowest-friction medium for piece #1, and sticking to 1–2 posts/week instead of daily posting. (C05·AI)</p>
+          </div>
+
+          <div>
+            <strong><span class="role-tag">AI</span> Where to Pick Up Next:</strong>
+            <ol style="margin-top: 6px;">
+              <li>Pick 2–3 topics you naturally geek out on and love discussing with friends;</li>
+              <li>Choose one lowest-friction medium (short written/image posts or smartphone video);</li>
+              <li>Decide whether to adopt "publish 10 pieces first (1–2/week)" and outline posts #1–#3 together.</li>
+            </ol>
+          </div>
+
+          <div>
+            <button type="button" class="btn-ghost" id="copy-resume-btn">Copy Continuation Prompt</button>
+            <span class="copy-feedback" id="resume-status" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+      </section>
+
+      <section id="raw-archive" class="sec" aria-labelledby="raw-h">
+        <div class="sec-head">
+          <span class="sec-num">06</span>
+          <h2 id="raw-h">Full Source &amp; Chat Archive (Collapsed by Default)</h2>
+        </div>
+        <p class="sec-sub">Expand below to inspect original note scans, full verbatim transcripts, or the complete 5-round conversation translated into English.</p>
+
+        <div class="raw-accordion">
+          <details id="raw-sources-details">
+            <summary>
+              <span>Original Note Scans &amp; Verbatim Transcripts (S01 / S02)</span>
+              <span class="summary-meta">../raw/source_01.jpg · source_02.jpg</span>
+            </summary>
+            <div class="details-body">
+              <div class="source-grid">
+                <div class="source-box" id="source-s01">
+                  <h3>S01 · Page 1 (Click image to zoom)</h3>
+                  <button type="button" class="img-zoom-btn" data-zoom-src="../raw/source_01.jpg" data-zoom-title="S01 · Naval Ravikant on how to build leverage (Page 1)">
+                    <img src="../raw/source_01.jpg" alt="Naval Ravikant on how to build leverage page 1 original image" width="1280" height="1463">
+                  </button>
+                  <pre class="transcript-box" tabindex="0">Naval Ravikant on how to build leverage
+
+Get paid at scale
+• If you want to make money you have to get paid at scale.
+• And why you, that's accountability, at scale, that's leverage, and just you getting paid as opposed to somebody else getting paid, that's specific knowledge.
+
+Specific knowledge cannot be taught
+• And it's not true that everything can be taught. In fact, the most interesting things cannot be taught.
+• But everything can be learned.
+• The first thing to notice about specific knowledge is that you can't be trained for it.
+• If you can be trained for it, if you can go to a class and learn specific knowledge, then somebody else can be trained for it too.
+
+Follow your curiosity
+• So, specific knowledge is found much more by pursuing your innate talents, your genuine curiosity, and your passion.
+• It's not by going to school for whatever is the hottest job, it's not for going into whatever field investors say is the hottest.
+• Very often specific knowledge is at the edge of knowledge. It's also stuff that's just being figured out or is really hard to figure out.
+• So, if you're not 100% into it somebody else who is 100% into it will outperform you.
+
+Go and obtain leverage
+• We are now living in an age of nearly infinite leverage, and all the great fortunes are created through leverage.
+• Your first job is to go and obtain leverage, and you can obtain leverage through permission by getting people to work for you, or by raising capital.
+• Or you can get leverage permissionlessly by learning how to code or becoming good communicator and podcasting, broadcasting, creating videos, writing, etc.
+
+Use permissionless leverage
+• The most interesting and the most important form of leverage is this idea of products that have no marginal cost of replication. This is the new form of leverage.
+• Now, you can multiply your efforts without having to involve other humans and without needing money from other humans.
+• Probably the most interesting thing to keep in mind about the new forms of leverage is they are permissionless. They don't require somebody else's permission for you to use them or succeed.
+• Coding, writing books, recording podcasts, tweeting, YouTubing, these kinds of things, these are permissionless.
+• For labor leverage, somebody has to decide to follow you. For capital leverage, somebody has to give you money to invest or to turn into a product.</pre>
+                </div>
+
+                <div class="source-box" id="source-s02">
+                  <h3>S02 · Page 2 (Click image to zoom)</h3>
+                  <button type="button" class="img-zoom-btn" data-zoom-src="../raw/source_02.jpg" data-zoom-title="S02 · Naval Ravikant on how to build leverage (Page 2)">
+                    <img src="../raw/source_02.jpg" alt="Naval Ravikant on how to build leverage page 2 original image" width="1280" height="1463">
+                  </button>
+                  <pre class="transcript-box" tabindex="0">Learn to command the robots
+• This is why I tell people learn to code.
+• Every great software developer, for example, now has an army of robots working for him at nighttime, while he or she sleeps, after they've written the code and it's just cranking away.
+• Coding is such a great superpower because now you can speak the language of the robot armies and you can tell them what to do.
+
+Combine all three kinds
+• Now, the beauty is when you combine all of these three.
+• That's where tech startups really excel, where you take just the minimum, but highest output labor that you can get, which are engineers, and designers, product developers. Then you add in capital. You use that for marketing, advertising, scaling. You add in lots of code and media and podcasts and content to get it all out there.
+• That is a magic combination, and that's why you see technology startups explode out of nowhere, use massive leverage and just make huge outsize returns.
+
+Judgment becomes the skill
+• In an age of infinite leverage, judgment becomes the most important skill.
+• The first part of your career's spent hustling to get leverage. Once you have the leverage, then you wanna slow down a bit, because your judgment really matters.
+• Ultimately, everything else that you do is actually setting you up to apply your judgment.
+• Demonstrated judgment, credibility around the judgment, is so critical.
+
+Take accountability first
+• Accountability is something you can take on immediately.
+• You can say, "Hey, I'll take charge of this thing that nobody wants to take charge of."
+• When you take on accountability, you're also publicly putting your neck on the chopping block, so you have to deliver.
+
+Build judgment through experience
+• Judgment takes experience. It takes a lot of time to build up.
+• You have to put yourself in positions where you can exercise judgment. That'll come from taking on accountability.
+• Leverage is something that society gives you after you've demonstrated judgment.
+• You can get it faster by learning high-leverage skills like coding or working with the media.</pre>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <details id="raw-chat-details">
+            <summary>
+              <span>Full 5-Round Conversation Record (C01 – C05, English Translation)</span>
+              <span class="summary-meta">../raw/chat_raw.md</span>
+            </summary>
+            <div class="details-body">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px; font-size:13px; color:var(--ink-3);">
+                <span>Complete 5-round discussion translated into English</span>
+                <button type="button" class="btn-ghost" id="toggle-all-rounds" aria-expanded="false">Expand All 5 Rounds</button>
+              </div>
+
+              <details class="chat-round" id="round-c01">
+                <summary>C01 · First Read: Break down the two pages of notes</summary>
+                <div class="round-body">
+                  <div class="turn is-user"><div class="turn-head"><span class="role-tag is-user">Me</span> Round 1</div><pre>(Attached two images: "Naval Ravikant on how to build leverage," English notes pp. 1–2)
+Walk me through the ideas inside and break them down.</pre></div>
+                  <div class="turn"><div class="turn-head"><span class="role-tag">AI</span> Round 1</div><pre>These two pages distill Silicon Valley investor Naval Ravikant's core wealth philosophy on building leverage: to get paid at scale rather than trading hours, you need specific knowledge, accountability, leverage tools, and ultimately judgment.
+
+1. Three Pillars of Getting Paid at Scale: Accountability ("why you"), Leverage ("at scale"), Specific Knowledge ("why you over someone else"—cannot be taught in standardized classes, found via innate talent and curiosity at the edge of knowledge).
+2. Categories of Leverage: Permissioned traditional levers (labor, capital) vs. permissionless new levers (code and media, zero marginal cost of replication). Code commands an "army of robots"; startups combine lean elite labor + scaling capital + code/media in a "magic combination."
+3. Path from Zero: Take accountability first -> build judgment through experience -> earn leverage, then slow down to steer with judgment.
+
+Which permissionless lever (writing, video, podcasts, or software tools) feels easiest for you to start with?</pre></div>
+                </div>
+              </details>
+
+              <details class="chat-round" id="round-c02">
+                <summary>C02 · Concept Check: Never traded stocks—life principles or finance?</summary>
+                <div class="round-body">
+                  <div class="turn is-user"><div class="turn-head"><span class="role-tag is-user">Me</span> Round 2</div><pre>What is leverage? I've never traded stocks and don't know much about that—answer me first: are these notes about life principles or finance?</pre></div>
+                  <div class="turn"><div class="turn-head"><span class="role-tag">AI</span> Round 2</div><pre>Direct answer first: These two pages are about life principles and personal growth mindset ("how to create value and earn effectively"), not stock trading or finance.
+
+Originally "leverage" is a physical crowbar—using small force to move a heavy stone:
+• Financial leverage (NOT what's here): borrowing money to trade stocks, risking principal wipeout and debt.
+• Life/work leverage here: tools multiplying single effort (e.g., making 50 cups of milk tea yourself vs. hiring 10 staff, or building an app/video that runs while you sleep with zero margin debt risk).</pre></div>
+                </div>
+              </details>
+
+              <details class="chat-round" id="round-c03">
+                <summary>C03 · Full Walk-Through: Explain end-to-end with examples and summary</summary>
+                <div class="round-body">
+                  <div class="turn is-user"><div class="turn-head"><span class="role-tag is-user">Me</span> Round 3</div><pre>Now explain the whole logic from start to finish with concrete examples to help me understand better, and give a summary at the end.</pre></div>
+                  <div class="turn"><div class="turn-head"><span class="role-tag">AI</span> Round 3</div><pre>Walked through all four stages with concrete analogies:
+1. Specific knowledge: office-software certificate vs. product taste or plain-English technical storytelling; trend-chasers vs. midnight curiosity.
+2. Obtaining leverage: fat-loss meal chain (needs staff &amp; capital) vs. recipe video or calorie-calculator tool (permissionless, zero marginal cost); robot army (vocabulary app) &amp; magic combination (early Instagram).
+3. Judgment: riding a bicycle (no leverage, scrape a knee) vs. steering a loaded cargo ship (high leverage, direction beats all-nighters).
+4. Accountability first: owning the messy project nobody wants; shipping early videos/apps to learn from real user feedback.</pre></div>
+                </div>
+              </details>
+
+              <details class="chat-round" id="round-c04">
+                <summary>C04 · Clarification: "Permissionless" correction &amp; "Magic Combination"</summary>
+                <div class="round-body">
+                  <div class="turn is-user"><div class="turn-head"><span class="role-tag is-user">Me</span> Round 4</div><pre>I'm still confused on two points: first, you didn't explain that "interest-free permission" leverage clearly enough; second, please expand in detail on the magic combination of the three levers.</pre></div>
+                  <div class="turn"><div class="turn-head"><span class="role-tag">AI</span> Round 4</div><pre>Quick correction: it is not "interest-free"—it is **permissionless** (needing no one's approval).
+1. Permissionless leverage: start tonight without approval + zero marginal cost of replication (steamed-bun shop kneading dough for each extra bun vs. an app or video serving 1 or 1,000,000 at near-zero extra cost).
+2. Magic combination: single levers hit ceilings. Coffee chain serving 10M users needs thousands of stores over 5–10 years; a 15-person productivity-app startup ships code onto 10M phones, builds fans via podcasts/videos, and uses raised capital for ads/servers to scale in six months. Between code tools and media content, which fits you better?</pre></div>
+                </div>
+              </details>
+
+              <details class="chat-round" id="round-c05">
+                <summary>C05 · Action Focus: Chosen media content—how to start &amp; advice (Stop Point)</summary>
+                <div class="round-body">
+                  <div class="turn is-user"><div class="turn-head"><span class="role-tag is-user">Me</span> Round 5</div><pre>How should I get started with online media content, and what advice do you have?</pre></div>
+                  <div class="turn"><div class="turn-head"><span class="role-tag">AI</span> Round 5</div><pre>Core principle: document what you already tinker with as a byproduct of living instead of acting like an expert.
+• 3-Step Launch: (1) follow genuine curiosity; (2) pick the lowest-friction medium (text/image posts or phone video—skip fancy gear); (3) set a strict "publish 10 pieces first" rule to complete the topic->draft->publish->feedback loop.
+• Tips: be a peer two steps ahead; specific beats grand; treat low early views as free judgment tuition; protect a 1–2/week cadence over daily posting.
+
+If you pick 2–3 topics you naturally love talking about nonstop with friends, which ones come to mind first?</pre></div>
+                </div>
+              </details>
+            </div>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <span>Personal Cognition Archive · <a href="./index.md">index.md</a> · <a href="./Naval's Leverage - Key Takeaways.pdf">Key Takeaways.pdf</a> · <a href="./Naval's Leverage - Original Text.pdf">Original Text.pdf</a></span>
+      <span>100% Offline Single-File Workbench · Local Relative Paths</span>
+    </footer>
+  </div>
+
+  <dialog class="lightbox" id="image-lightbox" closedby="any" aria-labelledby="lightbox-title">
+    <div class="lightbox-bar">
+      <strong id="lightbox-title" style="font-size:14px;">Original Image</strong>
+      <button type="button" class="btn-ghost" id="lightbox-close-btn">Close (Esc)</button>
+    </div>
+    <div class="lightbox-body">
+      <img id="lightbox-img" src="" alt="">
+    </div>
+  </dialog>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const cards = Array.from(document.querySelectorAll(".j-card"));
+      const argDrawers = Array.from(document.querySelectorAll(".arg-drawer"));
+      const modeBrief = document.getElementById("mode-brief");
+      const modeFull = document.getElementById("mode-full");
+      const searchInput = document.getElementById("wb-search");
+      const searchClear = document.getElementById("wb-search-clear");
+      const filterCount = document.getElementById("wb-filter-count");
+      const emptySearch = document.getElementById("empty-search");
+
+      function setViewMode(isFull) {
+        modeBrief.setAttribute("aria-pressed", String(!isFull));
+        modeFull.setAttribute("aria-pressed", String(isFull));
+        argDrawers.forEach((d) => { d.open = isFull; });
+      }
+
+      modeBrief.addEventListener("click", () => setViewMode(false));
+      modeFull.addEventListener("click", () => setViewMode(true));
+
+      function applyFilter() {
+        const q = searchInput.value.trim().toLowerCase();
+        searchClear.classList.toggle("is-visible", q.length > 0);
+        let visible = 0;
+
+        cards.forEach((card) => {
+          const text = (card.getAttribute("data-keywords") + " " + card.textContent).toLowerCase();
+          const match = !q || text.includes(q);
+          card.hidden = !match;
+          if (match) {
+            visible += 1;
+            if (q) {
+              const drawer = card.querySelector(".arg-drawer");
+              if (drawer) drawer.open = true;
+            }
+          }
+        });
+
+        filterCount.textContent = `${visible} / ${cards.length}`;
+        emptySearch.style.display = visible === 0 ? "block" : "none";
+      }
+
+      searchInput.addEventListener("input", applyFilter);
+      searchClear.addEventListener("click", () => {
+        searchInput.value = "";
+        applyFilter();
+        searchInput.focus();
+      });
+
+      function jumpToCard(id) {
+        const target = document.getElementById(id);
+        if (!target) return;
+        if (target.hidden) {
+          searchInput.value = "";
+          applyFilter();
+        }
+        const arg = target.querySelector(".arg-drawer");
+        if (arg) arg.open = true;
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        target.classList.remove("is-flash");
+        void target.offsetWidth;
+        target.classList.add("is-flash");
+      }
+
+      document.querySelectorAll("[data-jump-card]").forEach((el) => {
+        const id = el.getAttribute("data-jump-card");
+        const handler = (event) => {
+          if (el.tagName === "A") event.preventDefault();
+          jumpToCard(id);
+        };
+        el.addEventListener("click", handler);
+        if (el.tagName !== "A") {
+          el.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              jumpToCard(id);
+            }
+          });
+        }
+      });
+
+      const lightbox = document.getElementById("image-lightbox");
+      const lightboxImg = document.getElementById("lightbox-img");
+      const lightboxTitle = document.getElementById("lightbox-title");
+      const lightboxClose = document.getElementById("lightbox-close-btn");
+
+      document.querySelectorAll("[data-zoom-src]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const src = btn.getAttribute("data-zoom-src");
+          const title = btn.getAttribute("data-zoom-title") || "Original Image";
+          lightboxImg.src = src;
+          lightboxImg.alt = title;
+          lightboxTitle.textContent = title;
+          if (typeof lightbox.showModal === "function") {
+            lightbox.showModal();
+          } else {
+            window.open(src, "_blank", "noopener");
+          }
+        });
+      });
+
+      lightboxClose.addEventListener("click", () => lightbox.close());
+      lightbox.addEventListener("click", (e) => {
+        if (e.target === lightbox) lightbox.close();
+      });
+
+      const toggleAllBtn = document.getElementById("toggle-all-rounds");
+      const rounds = Array.from(document.querySelectorAll(".chat-round"));
+
+      function syncRoundBtn() {
+        const allOpen = rounds.every((r) => r.open);
+        toggleAllBtn.setAttribute("aria-expanded", String(allOpen));
+        toggleAllBtn.textContent = allOpen ? "Collapse All 5 Rounds" : "Expand All 5 Rounds";
+      }
+
+      toggleAllBtn.addEventListener("click", () => {
+        const next = !rounds.every((r) => r.open);
+        rounds.forEach((r) => { r.open = next; });
+        syncRoundBtn();
+      });
+
+      document.addEventListener("toggle", (e) => {
+        if (e.target instanceof HTMLDetailsElement && e.target.classList.contains("chat-round")) {
+          syncRoundBtn();
+        }
+      }, true);
+
+      async function copyText(text, statusEl, okMsg) {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+            statusEl.textContent = okMsg;
+          } else {
+            throw new Error("no clipboard");
+          }
+        } catch {
+          statusEl.textContent = "Clipboard unavailable here—please copy the text directly.";
+        }
+      }
+
+      const pitchText = [
+        "Naval's leverage isn't borrowing money to trade stocks—it's using code or media so an ordinary person can multiply one unit of effort without anyone's permission.",
+        "1) Why does money flow to you? Through untrainable specific knowledge grown from genuine curiosity.",
+        "2) How do you scale effort? Prioritize permissionless, zero-marginal-cost code and media; stack lean elite talent and capital once a team proves direction.",
+        "3) What's step one from zero? Take public accountability now; for media, document what you already tinker with and publish 10 pieces first.",
+        "Example: A steamed-bun shop must knead dough for every extra bun; an app or recipe video serves 1 or 1,000,000 people with virtually zero extra cost."
+      ].join("\n");
+
+      const resumeText = [
+        "I want to continue our discussion on Naval's Leverage from index.md:",
+        "1) I've confirmed this isn't stock margin trading and want to start with 'media content' as my permissionless lever.",
+        "2) We paused at Round 5: you suggested turning ongoing tinkering into a byproduct of living and proposed the 'publish 10 pieces first (1–2/week)' rule.",
+        "Help me pick 2–3 topics I naturally geek out on and choose the lowest-friction medium to launch."
+      ].join("\n");
+
+      document.getElementById("copy-pitch-btn").addEventListener("click", () => {
+        copyText(pitchText, document.getElementById("pitch-status"), "Copied 30s pitch");
+      });
+
+      document.getElementById("copy-resume-btn").addEventListener("click", () => {
+        copyText(resumeText, document.getElementById("resume-status"), "Copied continuation prompt");
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -46,3 +46,11 @@
 - **100% 离线单文件**：CSS、SVG、JS 全部内联，零外部 CDN 请求；所有原图与底稿走相对路径（`./raw/...`、`./index.md`）。
 - **双端零溢出与无障碍**：CSS Grid 使用 `minmax(0, 1fr)` 与 `min-width: 0`，确保 `375px` 手机竖屏 `scrollWidth <= innerWidth`；不使用行内 `onclick`；标题不放进 `<summary>`。
 - **交付自查**：以 `file://` 打开验证外链为 0、控制台报错为 0、375px 手机竖屏与 1280px 桌面布局完整、思维导图字号清晰、就地对照与底部原图均可正常展开加载。
+
+---
+
+## 4. `en/` 纯英文版 HTML 规范
+
+每个主题目录的 `en/` 子文件夹下必须同步生成纯英文版操作台 **`en/<Topic> - Key Takeaways.html`**（例如 `en/Naval's Leverage - Key Takeaways.html`）：
+- **100% 纯英文呈现**：设置 `<html lang="en">`，所有导航按钮、搜索框占位符、归因微标（`Author` / `Me` / `AI` / `Pending`）、思维导图 SVG、30 秒速讲卡、一键复制话术、判断卡与底部原材料（含原对话译文）全部使用自然英文，严禁混入中文字符。
+- **相对路径适配**：底稿与 PDF 指向同目录 `./index.md`、`./<Topic> - Key Takeaways.pdf`、`./<Topic> - Original Text.pdf`；原图与原始对话文件指向 `../raw/...`。

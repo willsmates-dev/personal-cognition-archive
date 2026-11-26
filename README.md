@@ -9,7 +9,7 @@
 - [PDF 排版规范](./规范/PDF%20排版规范.md) 定义 `<主题短名>·认知精华.pdf` 以及外文材料三件套（`纯英文原文.pdf` / `纯中文原文.pdf` / `中英原文.pdf`）的出版级版式与主题命名规则。
 - [AI 生成提示词](./规范/AI%20生成提示词.md) 提供新主题一键产出全套文件、单独返工与跨对话续聊的标准化 Prompt。
 - [Naval 样例原材料](./样例/Naval的杠杆/raw) 包含英文笔记的两张原图及用户与 AI 的五轮完整对话。
-- 首轮成品放在 `样例/Naval的杠杆/`，包含 `index.md`、`Naval的杠杆·认知精华.html`、`Naval的杠杆·认知精华.pdf`，以及三份原文 PDF（`Naval的杠杆·纯英文原文.pdf`、`Naval的杠杆·纯中文原文.pdf`、`Naval的杠杆·中英原文.pdf`）。
+- 首轮成品放在 `样例/Naval的杠杆/`，包含 `index.md`、`Naval的杠杆·认知精华.html`、`Naval的杠杆·认知精华.pdf`，以及三份原文 PDF（`Naval的杠杆·纯英文原文.pdf`、`Naval的杠杆·纯中文原文.pdf`、`Naval的杠杆·中英原文.pdf`）；另在 [`样例/Naval的杠杆/en/`](./样例/Naval的杠杆/en/) 下提供纯英文四件套版本（`index.md`、`Naval's Leverage - Key Takeaways.html`、`Naval's Leverage - Key Takeaways.pdf`、`Naval's Leverage - Original Text.pdf`）。
 
 ## 产物分工
 
@@ -20,6 +20,11 @@
   - **`<主题短名>·纯英文原文.pdf`**：只有英文原典，忠实重排。
   - **`<主题短名>·纯中文原文.pdf`**：只有中文直译，不混入扩展点评。
   - **`<主题短名>·中英原文.pdf`**：中英文对照集合版。
+- **`en/` 纯英文产物子文件夹**（每个主题目录下均同步产出，100% 纯英文，不含任何中文字符，方便英文阅读或对外分享）：
+  - **`en/index.md`**：纯英文版编辑底稿（含英文分析、思维导图节点、原文及已译为英文的完整对话记录）。
+  - **`en/<Topic> - Key Takeaways.html`**：纯英文版单栏交互操作台（UI、思维导图、判断卡与原文/对话均全英呈现，原图路径指向 `../raw/...`）。
+  - **`en/<Topic> - Key Takeaways.pdf`**：纯英文版出版级长文回顾 PDF。
+  - **`en/<Topic> - Original Text.pdf`**：纯英文版原文精排 PDF（页眉页脚与版面标注均全英文）。
 
 ## 页面与版式方向
 
