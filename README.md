@@ -7,7 +7,9 @@
 - [index.md 框架与生成规范](./index.md%20框架与生成规范.md) 定义输入、Agent 分析顺序、固定模板、证据定位和归因规则。
 - [HTML 回顾页规范](./规范/HTML%20回顾页规范.md) 定义 `<主题短名>·认知精华.html` 的纯白底单栏操作台结构、极简克制配色、思维导图与就地原文对照交互。
 - [PDF 排版规范](./规范/PDF%20排版规范.md) 定义 `<主题短名>·认知精华.pdf` 以及外文材料三件套（`纯英文原文.pdf` / `纯中文原文.pdf` / `中英原文.pdf`）的出版级版式与主题命名规则。
-- [AI 生成提示词](./规范/AI%20生成提示词.md) 提供新主题一键产出全套文件、单独返工与跨对话续聊的标准化 Prompt。
+- [AGENTS.md](./AGENTS.md) 与 [cognitive-distillation 技能](./.agents/skills/cognitive-distillation/SKILL.md) 配置工作区自动识别规则与完整执行流程：把文章/材料直接发进对话窗口即可自动触发全套产物生成。
+- [一键沉淀提示词](./规范/一键沉淀提示词.md) 提供零占位符的「文章 + 提示词」直接粘贴模板（可搭配任何文章或对话发给 AI，自动识别内容与语种并落盘）。
+- [AI 生成提示词](./规范/AI%20生成提示词.md) 提供零准备直出、指定目录沉淀、单独返工与跨对话续聊的标准化 Prompt 手册。
 - [Naval 样例原材料](./样例/Naval的杠杆/raw) 包含英文笔记的两张原图及用户与 AI 的五轮完整对话。
 - 首轮成品放在 `样例/Naval的杠杆/`，包含 `index.md`、`Naval的杠杆·认知精华.html`、`Naval的杠杆·认知精华.pdf`，以及三份原文 PDF（`Naval的杠杆·纯英文原文.pdf`、`Naval的杠杆·纯中文原文.pdf`、`Naval的杠杆·中英原文.pdf`）；另在 [`样例/Naval的杠杆/en/`](./样例/Naval的杠杆/en/) 下提供纯英文四件套版本（`index.md`、`Naval's Leverage - Key Takeaways.html`、`Naval's Leverage - Key Takeaways.pdf`、`Naval's Leverage - Original Text.pdf`）。
 
